@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,viewport-fit=cover,user-scalable=no" />
   <meta name="theme-color" content="#f2efe8" />
-  <title>Agenda personnel</title>
+  <title>Agenda</title>
   <link rel="preload" href="forced_square.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
   <link rel="manifest" href="manifest.json" />
   <style>
@@ -43,6 +43,12 @@
     .unlock-row button { border: 0; border-radius: 8px; padding: 0 12px; background: #b5ddca; color: #1c352d; cursor: pointer; font: inherit; font-size: 12px; font-weight: 800; }
     .unlock-row button:active { transform: translateY(1px); }
     .message { min-height: 16px; margin: 8px 0 0; color: #f3b6a7; font-size: 11px; }
+    .puzzle-day { cursor: pointer; }
+    .puzzle-day:focus-within { outline: 2px solid #b5ddca; outline-offset: -2px; }
+    .puzzle-day .unlock-row { display: none; }
+    .puzzle-day.is-open .unlock-row { display: flex; }
+    .puzzle-day .message { display: none; }
+    .puzzle-day.is-open .message { display: block; }
     .agenda-footer { display: flex; justify-content: space-between; gap: 20px; margin-top: 18px; color: #8a8378; font-size: 12px; }
     .agenda-footer strong { color: #5c554b; }
     @media (max-width: 760px) {
@@ -74,7 +80,7 @@
           <div class="day"><div class="day-number"><span>5</span></div><div class="event"><small>11:00</small><strong>Appel famille</strong></div></div>
           <div class="day"><div class="day-number"><span>6</span></div></div>
 
-          <div class="day monday-puzzle"><div class="day-number"><span>7</span><span>◆</span></div><div class="event monday-puzzle"><small>Note privée · lundi</small><strong>Rendez-vous non listé</strong><p>Un mot est inscrit dans ce lundi. Saisis-le pour ouvrir l’espace suivant.</p><form class="unlock-row" id="unlock-form"><input id="unlock-input" name="unlock" autocomplete="off" aria-label="Mot-clé du lundi" placeholder="Mot-clé" /><button type="submit">Ouvrir</button></form><div class="message" id="unlock-message" role="status" aria-live="polite"></div></div></div>
+          <div class="day puzzle-day" id="monday-entry" tabindex="0" aria-label="Modifier l’événement du lundi"><div class="day-number"><span>7</span></div><div class="event"><small>09:00</small><strong>Café avec Marie</strong><form class="unlock-row" id="unlock-form"><input id="unlock-input" name="unlock" autocomplete="off" aria-label="Note de l’événement" placeholder="Ajouter une note" /><button type="submit">Enregistrer</button></form><div class="message" id="unlock-message" role="status" aria-live="polite"></div></div></div>
           <div class="day"><div class="day-number"><span>8</span></div></div>
           <div class="day"><div class="day-number"><span>9</span></div><div class="event"><small>14:00</small><strong>Dossier à relire</strong></div></div>
           <div class="day"><div class="day-number"><span>10</span></div></div>
@@ -116,6 +122,7 @@
       const form = document.getElementById('unlock-form');
       const input = document.getElementById('unlock-input');
       const message = document.getElementById('unlock-message');
+      const monday = document.getElementById('monday-entry');
       const gate = document.getElementById('agenda-gate');
       const unlock = () => {
         gate.remove();
@@ -126,12 +133,13 @@
         document.getElementById('transition-layer').style.visibility = 'visible';
         window.dispatchEvent(new Event('agenda-unlocked'));
       };
+      monday.addEventListener('click', () => monday.classList.add('is-open'));
+      monday.addEventListener('keydown', event => { if (event.key === 'Enter' || event.key === ' ') monday.classList.add('is-open'); });
       form.addEventListener('submit', event => {
         event.preventDefault();
         if (input.value.trim().toLowerCase() === 'polytrack') unlock();
-        else { message.textContent = 'Ce mot ne correspond pas à la note du lundi.'; input.select(); }
+        else { message.textContent = 'La note n’a pas pu être enregistrée.'; input.select(); }
       });
-      input.focus();
     })();
   </script>
   <script defer src="error_screen.bundle.js?v=agenda-gate-1"></script>

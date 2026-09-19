@@ -7,7 +7,8 @@ describe("agenda escape-game gate", () => {
 
   it("contains the Monday puzzle and the PolyTrack unlock condition", () => {
     expect(html).toContain("Agenda personnel");
-    expect(html).toContain("Note privée · lundi");
+    expect(html).toContain("Café avec Marie");
+    expect(html).toContain("monday-entry");
     expect(html).toContain("name=\"unlock\"");
     expect(html).toContain("input.value.trim().toLowerCase() === 'polytrack'");
     expect(html).toContain("gate.remove()");
