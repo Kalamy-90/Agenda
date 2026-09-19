@@ -7,11 +7,12 @@ describe("agenda escape-game gate", () => {
 
   it("contains the Monday puzzle and the PolyTrack unlock condition", () => {
     expect(html).toContain("Agenda personnel");
-    expect(html).toContain("Café avec Marie");
+    expect(html).not.toContain("Café avec Marie");
     expect(html).toContain("data-date=\"2026-09-07\"");
     expect(html).toContain("id=\"editor-backdrop\"");
     expect(html).toContain("localStorage.setItem(labelFor(activeDay), value)");
     expect(html).toContain("value.toLowerCase() === 'polytrack'");
+    expect(html).toContain("agenda-empty-note-1");
     expect(html).toContain("gate.remove()");
   });
 });

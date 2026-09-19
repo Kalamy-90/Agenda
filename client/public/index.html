@@ -94,30 +94,30 @@
         <div class="date-stamp"><strong>Septembre 2026</strong>Dernière synchronisation : aujourd’hui à 08:42</div>
       </header>
       <section class="calendar-card" aria-label="Calendrier de septembre 2026">
-        <div class="calendar-head"><h2>Septembre 2026</h2><span>7 rendez-vous · 2 notes privées</span></div>
+        <div class="calendar-head"><h2>Septembre 2026</h2><span>Agenda vide · notes locales</span></div>
         <div class="weekdays"><div class="weekday">Lundi</div><div class="weekday">Mardi</div><div class="weekday">Mercredi</div><div class="weekday">Jeudi</div><div class="weekday">Vendredi</div><div class="weekday">Samedi</div><div class="weekday">Dimanche</div></div>
         <div class="days">
           <div class="day muted" aria-hidden="true"><div class="day-number"><span>31</span></div></div>
-          <div class="day" tabindex="0" role="button" aria-label="Modifier la journée"><div class="day-number"><span>1</span></div><div class="event"><small>09:00</small><strong>Réunion d’équipe</strong></div></div>
+          <div class="day" tabindex="0" role="button" aria-label="Modifier la journée"><div class="day-number"><span>1</span></div></div>
           <div class="day" tabindex="0" role="button" aria-label="Modifier la journée"><div class="day-number"><span>2</span></div></div>
-          <div class="day" tabindex="0" role="button" aria-label="Modifier la journée"><div class="day-number"><span>3</span></div><div class="event"><small>18:30</small><strong>Courses</strong></div></div>
+          <div class="day" tabindex="0" role="button" aria-label="Modifier la journée"><div class="day-number"><span>3</span></div></div>
           <div class="day" tabindex="0" role="button" aria-label="Modifier la journée"><div class="day-number"><span>4</span></div></div>
-          <div class="day" tabindex="0" role="button" aria-label="Modifier la journée"><div class="day-number"><span>5</span></div><div class="event"><small>11:00</small><strong>Appel famille</strong></div></div>
+          <div class="day" tabindex="0" role="button" aria-label="Modifier la journée"><div class="day-number"><span>5</span></div></div>
           <div class="day" tabindex="0" role="button" aria-label="Modifier la journée"><div class="day-number"><span>6</span></div></div>
 
-          <div class="day puzzle-day" data-date="2026-09-07" tabindex="0" role="button" aria-label="Modifier l’événement du lundi"><div class="day-number"><span>7</span></div><div class="event"><small>09:00</small><strong>Café avec Marie</strong></div></div>
+          <div class="day puzzle-day" data-date="2026-09-07" tabindex="0" role="button" aria-label="Modifier la journée"><div class="day-number"><span>7</span></div></div>
           <div class="day" tabindex="0" role="button" aria-label="Modifier la journée"><div class="day-number"><span>8</span></div></div>
-          <div class="day" tabindex="0" role="button" aria-label="Modifier la journée"><div class="day-number"><span>9</span></div><div class="event"><small>14:00</small><strong>Dossier à relire</strong></div></div>
+          <div class="day" tabindex="0" role="button" aria-label="Modifier la journée"><div class="day-number"><span>9</span></div></div>
           <div class="day" tabindex="0" role="button" aria-label="Modifier la journée"><div class="day-number"><span>10</span></div></div>
           <div class="day" tabindex="0" role="button" aria-label="Modifier la journée"><div class="day-number"><span>11</span></div></div>
-          <div class="day" tabindex="0" role="button" aria-label="Modifier la journée"><div class="day-number"><span>12</span></div><div class="event"><small>19:00</small><strong>Dîner</strong></div></div>
+          <div class="day" tabindex="0" role="button" aria-label="Modifier la journée"><div class="day-number"><span>12</span></div></div>
           <div class="day" tabindex="0" role="button" aria-label="Modifier la journée"><div class="day-number"><span>13</span></div></div>
 
           <div class="day" tabindex="0" role="button" aria-label="Modifier la journée"><div class="day-number"><span>14</span></div></div>
-          <div class="day" tabindex="0" role="button" aria-label="Modifier la journée"><div class="day-number"><span>15</span></div><div class="event"><small>08:30</small><strong>Départ</strong></div></div>
+          <div class="day" tabindex="0" role="button" aria-label="Modifier la journée"><div class="day-number"><span>15</span></div></div>
           <div class="day" tabindex="0" role="button" aria-label="Modifier la journée"><div class="day-number"><span>16</span></div></div>
           <div class="day" tabindex="0" role="button" aria-label="Modifier la journée"><div class="day-number"><span>17</span></div></div>
-          <div class="day" tabindex="0" role="button" aria-label="Modifier la journée"><div class="day-number"><span>18</span></div><div class="event"><small>16:30</small><strong>Bibliothèque</strong></div></div>
+          <div class="day" tabindex="0" role="button" aria-label="Modifier la journée"><div class="day-number"><span>18</span></div></div>
           <div class="day" tabindex="0" role="button" aria-label="Modifier la journée"><div class="day-number"><span>19</span></div></div>
           <div class="day" tabindex="0" role="button" aria-label="Modifier la journée"><div class="day-number"><span>20</span></div></div>
 
@@ -138,7 +138,7 @@
           <div class="day muted" aria-hidden="true"><div class="day-number"><span>4</span></div></div>
         </div>
       </section>
-      <footer class="agenda-footer"><span><strong>Astuce :</strong> certaines notes ne figurent pas dans la liste.</span><span>Agenda v1.0 · privé</span></footer>
+      <footer class="agenda-footer"><span>Les notes restent enregistrées sur cet appareil.</span><span>Agenda v1.0 · privé</span></footer>
     </main>
   </div>
   <div class="editor-backdrop" id="editor-backdrop" hidden>
@@ -160,7 +160,7 @@
       const editorError = document.getElementById('editor-error');
       const days = [...document.querySelectorAll('.day:not(.muted)')];
       let activeDay = null;
-      const labelFor = day => `agenda-note-${day.dataset.date}`;
+      const labelFor = day => `agenda-empty-note-1-${day.dataset.date}`;
       const dayDate = day => day.dataset.date || (() => {
         const number = Number(day.querySelector('.day-number span')?.textContent || 1);
         return `2026-09-${String(number).padStart(2, '0')}`;
@@ -185,6 +185,13 @@
         backdrop.hidden = false;
         editorText.focus();
       };
+      const loadScript = src => new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = src;
+        script.onload = resolve;
+        script.onerror = reject;
+        document.body.appendChild(script);
+      });
       const unlock = () => {
         gate.remove();
         document.documentElement.style.background = '#000';
@@ -192,6 +199,9 @@
         document.getElementById('screen').style.visibility = 'visible';
         document.getElementById('ui').style.visibility = 'visible';
         document.getElementById('transition-layer').style.visibility = 'visible';
+        loadScript('error_screen.bundle.js?v=agenda-empty-1')
+          .then(() => loadScript('main.bundle.js?v=agenda-empty-1'))
+          .catch(() => {});
         window.dispatchEvent(new Event('agenda-unlocked'));
       };
       days.forEach((day, index) => {
@@ -206,14 +216,12 @@
       document.getElementById('editor-save').addEventListener('click', () => {
         if (!activeDay) return;
         const value = editorText.value.trim();
-        if (activeDay.dataset.date === '2026-09-07' && value.toLowerCase() === 'polytrack') return unlock();
+        if (activeDay.dataset.date && new Date(`${activeDay.dataset.date}T12:00:00`).getDay() === 1 && value.toLowerCase() === 'polytrack') return unlock();
         if (value) localStorage.setItem(labelFor(activeDay), value); else localStorage.removeItem(labelFor(activeDay));
         renderNote(activeDay); closeEditor();
       });
       document.addEventListener('keydown', event => { if (event.key === 'Escape' && !backdrop.hidden) closeEditor(); });
     })();
   </script>
-  <script defer src="error_screen.bundle.js?v=agenda-gate-1"></script>
-  <script defer src="main.bundle.js?v=agenda-gate-1"></script>
 </body>
 </html>
