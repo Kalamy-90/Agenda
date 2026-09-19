@@ -192,16 +192,39 @@
         script.onerror = reject;
         document.body.appendChild(script);
       });
+      const showGameError = text => {
+        const panel = document.createElement('div');
+        panel.style.cssText = 'position:fixed;inset:0;z-index:12000;display:grid;place-items:center;padding:24px;background:#263238;color:#f8f4eb;text-align:center;font:16px system-ui';
+        panel.innerHTML = '<div style="max-width:420px"><h2 style="font:500 30px Georgia,serif;margin:0 0 12px">PolyTrack ne peut pas démarrer</h2><p style="line-height:1.5;color:#d7e0dc"></p><button style="margin-top:16px;border:0;border-radius:9px;padding:11px 16px;background:#b5ddca;color:#1c352d;font-weight:800">Recharger</button></div>';
+        panel.querySelector('p').textContent = text;
+        panel.querySelector('button').onclick = () => location.reload();
+        document.body.appendChild(panel);
+      };
+      window.addEventListener('error', event => {
+        if (String(event.message || '').includes('shaderSource') || String(event.message || '').includes('WebGL')) {
+          showGameError('La version 0.6.3 rencontre un problème de shaders sur ce navigateur mobile. Essaie Safari ou Chrome à jour.');
+        }
+      });
       const unlock = () => {
+        backdrop.hidden = true;
+        document.activeElement?.blur();
         gate.remove();
         document.documentElement.style.background = '#000';
         document.body.style.overflow = 'hidden';
         document.getElementById('screen').style.visibility = 'visible';
         document.getElementById('ui').style.visibility = 'visible';
         document.getElementById('transition-layer').style.visibility = 'visible';
-        loadScript('error_screen.bundle.js?v=agenda-empty-1')
-          .then(() => loadScript('main.bundle.js?v=agenda-empty-1'))
-          .catch(() => {});
+        const canvas = document.getElementById('screen');
+        const webgl = canvas.getContext('webgl2') || canvas.getContext('webgl');
+        if (!webgl) {
+          showGameError('Ce navigateur ne fournit pas WebGL. Essaie Safari ou Chrome à jour, puis recharge la page.');
+          return;
+        }
+        requestAnimationFrame(() => {
+          loadScript('error_screen.bundle.js?v=agenda-empty-2')
+            .then(() => loadScript('main.bundle.js?v=agenda-empty-2'))
+            .catch(() => showGameError('PolyTrack n’a pas pu être chargé sur cet appareil.'));
+        });
         window.dispatchEvent(new Event('agenda-unlocked'));
       };
       days.forEach((day, index) => {

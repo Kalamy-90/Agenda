@@ -13,6 +13,8 @@ describe("agenda escape-game gate", () => {
     expect(html).toContain("localStorage.setItem(labelFor(activeDay), value)");
     expect(html).toContain("value.toLowerCase() === 'polytrack'");
     expect(html).toContain("agenda-empty-note-1");
+    expect(html).toContain("loadScript('main.bundle.js?v=agenda-empty-2')");
+    expect(html).toContain("getContext('webgl2')");
     expect(html).toContain("gate.remove()");
   });
 });
