@@ -2,6 +2,8 @@
 
 Agenda est un calendrier mensuel personnel qui embarque PolyTrack 0.6.3 dans une expérience locale. Le dépôt contient la version validée du site et du serveur : calendrier avec libellés de jours, lancement du jeu, relais API PolyTrack, map de la semaine, classements, multijoueur et synchronisation des profils natifs.
 
+Pour copier puis héberger gratuitement le projet, suivre le guide [DEPLOY_FREE.md](./DEPLOY_FREE.md). Il décrit le clone GitHub, le test local, le déploiement GitHub + Render, les routes à conserver et les URLs qu’il ne faut pas modifier.
+
 ## Ce qui fonctionne dans cette version
 
 - Calendrier mensuel avec le numéro et le nom du jour dans chaque case.
