@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,viewport-fit=cover,user-scalable=no" />
+  <meta name="theme-color" content="#f2efe8" />
+  <title>Agenda</title>
+  <link rel="preload" href="forced_square.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+  <link rel="manifest" href="manifest.json" />
+  <style>
+    :root { font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: #263238; background: #f2efe8; }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; background: #f2efe8; }
+    #screen, #ui, #transition-layer { visibility: hidden; }
+    .agenda-gate { position: fixed; inset: 0; z-index: 10000; overflow: auto; background: #f2efe8; color: #263238; }
+    .agenda-shell { width: min(1180px, calc(100% - 32px)); margin: 0 auto; padding: 26px 0 44px; }
+    .topbar { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; border-bottom: 1px solid #c7c2b8; padding-bottom: 18px; }
+    .eyebrow { margin: 0 0 8px; color: #7d766b; font-size: 11px; font-weight: 800; letter-spacing: .18em; text-transform: uppercase; }
+    h1 { margin: 0; font-family: Georgia, serif; font-size: clamp(32px, 6vw, 64px); font-weight: 500; letter-spacing: -.045em; line-height: .95; }
+    .date-stamp { color: #7d766b; font-size: 13px; text-align: right; line-height: 1.55; }
+    .date-stamp strong { display: block; color: #263238; font-size: 16px; }
+    .calendar-card { margin-top: 26px; border: 1px solid #c7c2b8; border-radius: 18px; background: rgba(255,255,255,.48); box-shadow: 0 18px 45px rgba(74,65,51,.08); overflow: hidden; }
+    .calendar-head { display: flex; justify-content: space-between; align-items: center; padding: 18px 22px; border-bottom: 1px solid #d7d2c8; }
+    .calendar-head h2 { margin: 0; font-size: 18px; font-weight: 700; }
+    .calendar-head span { color: #8a8378; font-size: 12px; }
+    .weekdays, .days { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); }
+    .weekday { padding: 12px 10px; border-right: 1px solid #ded9cf; color: #837b70; font-size: 11px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+    .weekday:last-child { border-right: 0; }
+    .day { min-height: 142px; cursor: pointer; transition: background .18s ease, box-shadow .18s ease; padding: 10px; border-top: 1px solid #ded9cf; border-right: 1px solid #ded9cf; background: rgba(255,255,255,.24); }
+    .day:nth-child(7n) { border-right: 0; }
+    .day:hover { background: rgba(220,232,225,.34); box-shadow: inset 0 0 0 2px rgba(181,221,202,.36); }
+    .day:focus-visible { outline: 2px solid #7fa994; outline-offset: -2px; }
+    .user-note { margin-top: 8px; padding: 9px 10px; border-radius: 10px; background: #fff3c9; color: #5b4b1d; font-size: 12px; line-height: 1.35; white-space: pre-wrap; overflow-wrap: anywhere; }
+    .editor-backdrop { position: fixed; inset: 0; z-index: 11000; display: grid; place-items: center; padding: 18px; background: rgba(38,50,56,.42); }
+    .editor-backdrop[hidden] { display: none; }
+    .editor-modal { width: min(470px, 100%); border: 1px solid #c7c2b8; border-radius: 18px; background: #fffdf8; box-shadow: 0 24px 70px rgba(38,50,56,.28); padding: 22px; }
+    .editor-modal header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+    .editor-modal h2 { margin: 0; font-family: Georgia, serif; font-size: 26px; font-weight: 500; }
+    .editor-modal p { margin: 5px 0 0; color: #7d766b; font-size: 12px; }
+    .editor-close { border: 0; background: transparent; color: #7d766b; font-size: 24px; line-height: 1; cursor: pointer; }
+    .editor-modal textarea { width: 100%; min-height: 150px; resize: vertical; border: 1px solid #c7c2b8; border-radius: 12px; padding: 12px; background: #f8f5ee; color: #263238; font: inherit; font-size: 14px; outline: none; }
+    .editor-modal textarea:focus { border-color: #7fa994; box-shadow: 0 0 0 3px rgba(127,169,148,.18); }
+    .editor-actions { display: flex; justify-content: space-between; gap: 10px; margin-top: 14px; }
+    .editor-actions button { border: 0; border-radius: 9px; padding: 10px 14px; cursor: pointer; font: inherit; font-size: 13px; font-weight: 800; }
+    .editor-delete { background: #f2d8d1; color: #713c32; }
+    .editor-save { background: #b5ddca; color: #1c352d; }
+    .editor-error { min-height: 18px; margin: 10px 0 0; color: #a04f42; font-size: 12px; }
+    .day.muted { color: #b2aca2; background: rgba(232,228,220,.35); }
+    .day-number { display: flex; justify-content: space-between; align-items: center; color: #615a50; font-size: 12px; font-weight: 800; }
+    .day.muted .day-number { color: #aaa398; }
+    .event { margin-top: 13px; padding: 12px; border-radius: 12px; background: #dce8e1; color: #23453a; }
+    .event small { display: block; margin-bottom: 5px; color: #577468; font-size: 10px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+    .event strong { display: block; font-size: 14px; }
+    .monday-puzzle { background: #263238; color: #f8f4eb; box-shadow: 0 8px 18px rgba(38,50,56,.16); }
+    .monday-puzzle small { color: #a9c9bc; }
+    .monday-puzzle p { margin: 8px 0 11px; color: #d7e0dc; font-size: 12px; line-height: 1.45; }
+    .unlock-row { display: flex; gap: 7px; }
+    .unlock-row input { min-width: 0; flex: 1; border: 1px solid #83968e; border-radius: 8px; padding: 9px 10px; outline: none; background: #f8f4eb; color: #263238; font: inherit; font-size: 12px; }
+    .unlock-row input:focus { border-color: #b5ddca; box-shadow: 0 0 0 3px rgba(181,221,202,.18); }
+    .unlock-row button { border: 0; border-radius: 8px; padding: 0 12px; background: #b5ddca; color: #1c352d; cursor: pointer; font: inherit; font-size: 12px; font-weight: 800; }
+    .unlock-row button:active { transform: translateY(1px); }
+    .message { min-height: 16px; margin: 8px 0 0; color: #f3b6a7; font-size: 11px; }
+    .puzzle-day { cursor: pointer; }
+    .puzzle-day:focus-within { outline: 2px solid #b5ddca; outline-offset: -2px; }
+    .puzzle-day .unlock-row { display: none; }
+    .puzzle-day.is-open .unlock-row { display: flex; }
+    .puzzle-day .message { display: none; }
+    .puzzle-day.is-open .message { display: block; }
+    .agenda-footer { display: flex; justify-content: space-between; gap: 20px; margin-top: 18px; color: #8a8378; font-size: 12px; }
+    .agenda-footer strong { color: #5c554b; }
+    @media (min-width: 761px) and (max-width: 1024px) {
+      .days, .weekdays { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+      .day:nth-child(7n) { border-right: 1px solid #ded9cf; }
+      .day:nth-child(4n) { border-right: 0; }
+    }
+    @media (max-width: 760px) {
+      .agenda-shell { width: min(100% - 20px, 560px); padding-top: 18px; }
+      .topbar { align-items: flex-start; flex-direction: column; gap: 16px; }
+      .date-stamp { text-align: left; }
+      .calendar-card { overflow: hidden; }
+      .weekdays { display: none; }
+      .days { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .day { min-height: 132px; border-right: 1px solid #ded9cf; }
+      .day:nth-child(2n) { border-right: 0; }
+      .agenda-footer { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <div class="agenda-gate" id="agenda-gate" role="application" aria-label="Agenda personnel">
+    <main class="agenda-shell">
+      <header class="topbar">
+        <div><p class="eyebrow">Espace personnel · vue mensuelle</p><h1>Agenda</h1></div>
+        <div class="date-stamp"><strong>Septembre 2026</strong>Dernière synchronisation : aujourd’hui à 08:42</div>
+      </header>
+      <section class="calendar-card" aria-label="Calendrier de septembre 2026">
+        <div class="calendar-head"><h2>Septembre 2026</h2><span>Agenda vide · notes locales</span></div>
+        <div class="weekdays"><div class="weekday">Lundi</div><div class="weekday">Mardi</div><div class="weekday">Mercredi</div><div class="weekday">Jeudi</div><div class="weekday">Vendredi</div><div class="weekday">Samedi</div><div class="weekday">Dimanche</div></div>
+        <div class="days">
+          <div class="day muted" aria-hidden="true"><div class="day-number"><span>31</span></div></div>
+          <div class="day" tabindex="0" role="button" aria-label="Modifier la journée"><div class="day-number"><span>1</span></div></div>
+          <div class="day" tabindex="0" role="button" aria-label="Modifier la journée"><div class="day-number"><span>2</span></div></div>
+          <div class="day" tabindex="0" role="button" aria-label="Modifier la journée"><div class="day-number"><span>3</span></div></div>
+          <div class="day" tabindex="0" role="button" aria-label="Modifier la journée"><div class="day-number"><span>4</span></div></div>
+          <div class="day" tabindex="0" role="button" aria-label="Modifier la journée"><div class="day-number"><span>5</span></div></div>
+          <div class="day" tabindex="0" role="button" aria-label="Modifier la journée"><div class="day-number"><span>6</span></div></div>
+
+          <div class="day puzzle-day" data-date="2026-09-07" tabindex="0" role="button" aria-label="Modifier la journée"><div class="day-number"><span>7</span></div></div>
+          <div class="day" tabindex="0" role="button" aria-label="Modifier la journée"><div class="day-number"><span>8</span></div></div>
+          <div class="day" tabindex="0" role="button" aria-label="Modifier la journée"><div class="day-number"><span>9</span></div></div>
+          <div class="day" tabindex="0" role="button" aria-label="Modifier la journée"><div class="day-number"><span>10</span></div></div>
+          <div class="day" tabindex="0" role="button" aria-label="Modifier la journée"><div class="day-number"><span>11</span></div></div>
+          <div class="day" tabindex="0" role="button" aria-label="Modifier la journée"><div class="day-number"><span>12</span></div></div>
+          <div class="day" tabindex="0" role="button" aria-label="Modifier la journée"><div class="day-number"><span>13</span></div></div>
+
+          <div class="day" tabindex="0" role="button" aria-label="Modifier la journée"><div class="day-number"><span>14</span></div></div>
+          <div class="day" tabindex="0" role="button" aria-label="Modifier la journée"><div class="day-number"><span>15</span></div></div>
+          <div class="day" tabindex="0" role="button" aria-label="Modifier la journée"><div class="day-number"><span>16</span></div></div>
+          <div class="day" tabindex="0" role="button" aria-label="Modifier la journée"><div class="day-number"><span>17</span></div></div>
+          <div class="day" tabindex="0" role="button" aria-label="Modifier la journée"><div class="day-number"><span>18</span></div></div>
+          <div class="day" tabindex="0" role="button" aria-label="Modifier la journée"><div class="day-number"><span>19</span></div></div>
+          <div class="day" tabindex="0" role="button" aria-label="Modifier la journée"><div class="day-number"><span>20</span></div></div>
+
+          <div class="day" tabindex="0" role="button" aria-label="Modifier la journée"><div class="day-number"><span>21</span></div></div>
+          <div class="day" tabindex="0" role="button" aria-label="Modifier la journée"><div class="day-number"><span>22</span></div></div>
+          <div class="day" tabindex="0" role="button" aria-label="Modifier la journée"><div class="day-number"><span>23</span></div></div>
+          <div class="day" tabindex="0" role="button" aria-label="Modifier la journée"><div class="day-number"><span>24</span></div></div>
+          <div class="day" tabindex="0" role="button" aria-label="Modifier la journée"><div class="day-number"><span>25</span></div></div>
+          <div class="day" tabindex="0" role="button" aria-label="Modifier la journée"><div class="day-number"><span>26</span></div></div>
+          <div class="day" tabindex="0" role="button" aria-label="Modifier la journée"><div class="day-number"><span>27</span></div></div>
+
+          <div class="day" tabindex="0" role="button" aria-label="Modifier la journée"><div class="day-number"><span>28</span></div></div>
+          <div class="day" tabindex="0" role="button" aria-label="Modifier la journée"><div class="day-number"><span>29</span></div></div>
+          <div class="day" tabindex="0" role="button" aria-label="Modifier la journée"><div class="day-number"><span>30</span></div></div>
+          <div class="day muted" aria-hidden="true"><div class="day-number"><span>1</span></div></div>
+          <div class="day muted" aria-hidden="true"><div class="day-number"><span>2</span></div></div>
+          <div class="day muted" aria-hidden="true"><div class="day-number"><span>3</span></div></div>
+          <div class="day muted" aria-hidden="true"><div class="day-number"><span>4</span></div></div>
+        </div>
+      </section>
+      <footer class="agenda-footer"><span>Les notes restent enregistrées sur cet appareil.</span><span>Agenda v1.0 · privé</span></footer>
+    </main>
+  </div>
+  <div class="editor-backdrop" id="editor-backdrop" hidden>
+    <section class="editor-modal" role="dialog" aria-modal="true" aria-labelledby="editor-title">
+      <header><div><h2 id="editor-title">Modifier la journée</h2><p id="editor-date">Agenda personnel</p></div><button class="editor-close" id="editor-close" type="button" aria-label="Fermer">×</button></header>
+      <textarea id="editor-text" placeholder="Écrire une note, un rendez-vous ou une idée…"></textarea>
+      <div class="editor-error" id="editor-error" role="status" aria-live="polite"></div>
+      <div class="editor-actions"><button class="editor-delete" id="editor-delete" type="button">Effacer</button><button class="editor-save" id="editor-save" type="button">Enregistrer</button></div>
+    </section>
+  </div>
+  <canvas id="screen"></canvas><div id="ui"></div><div id="transition-layer"></div>
+  <script>
+    (() => {
+      const gate = document.getElementById('agenda-gate');
+      const backdrop = document.getElementById('editor-backdrop');
+      const editorText = document.getElementById('editor-text');
+      const editorTitle = document.getElementById('editor-title');
+      const editorDate = document.getElementById('editor-date');
+      const editorError = document.getElementById('editor-error');
+      const days = [...document.querySelectorAll('.day:not(.muted)')];
+      let activeDay = null;
+      const labelFor = day => `agenda-empty-note-1-${day.dataset.date}`;
+      const dayDate = day => day.dataset.date || (() => {
+        const number = Number(day.querySelector('.day-number span')?.textContent || 1);
+        return `2026-09-${String(number).padStart(2, '0')}`;
+      })();
+      const renderNote = day => {
+        day.querySelector('.user-note')?.remove();
+        const value = localStorage.getItem(labelFor(day));
+        if (!value) return;
+        const note = document.createElement('div');
+        note.className = 'user-note';
+        note.textContent = value;
+        day.appendChild(note);
+      };
+      const closeEditor = () => { backdrop.hidden = true; activeDay = null; };
+      const openEditor = day => {
+        activeDay = day;
+        const date = dayDate(day);
+        editorTitle.textContent = new Date(`${date}T12:00:00`).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
+        editorDate.textContent = 'Ajouter ou modifier une note personnelle';
+        editorText.value = localStorage.getItem(labelFor(day)) || '';
+        editorError.textContent = '';
+        backdrop.hidden = false;
+        editorText.focus();
+      };
+      const loadScript = src => new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = src;
+        script.onload = resolve;
+        script.onerror = reject;
+        document.body.appendChild(script);
+      });
+      const showGameError = text => {
+        const panel = document.createElement('div');
+        panel.style.cssText = 'position:fixed;inset:0;z-index:12000;display:grid;place-items:center;padding:24px;background:#263238;color:#f8f4eb;text-align:center;font:16px system-ui';
+        panel.innerHTML = '<div style="max-width:420px"><h2 style="font:500 30px Georgia,serif;margin:0 0 12px">PolyTrack ne peut pas démarrer</h2><p style="line-height:1.5;color:#d7e0dc"></p><button style="margin-top:16px;border:0;border-radius:9px;padding:11px 16px;background:#b5ddca;color:#1c352d;font-weight:800">Recharger</button></div>';
+        panel.querySelector('p').textContent = text;
+        panel.querySelector('button').onclick = () => location.reload();
+        document.body.appendChild(panel);
+      };
+      window.addEventListener('error', event => {
+        if (String(event.message || '').includes('shaderSource') || String(event.message || '').includes('WebGL')) {
+          showGameError('La version 0.6.3 rencontre un problème de shaders sur ce navigateur mobile. Essaie Safari ou Chrome à jour.');
+        }
+      });
+      const unlock = () => {
+        backdrop.hidden = true;
+        document.activeElement?.blur();
+        gate.remove();
+        document.documentElement.style.background = '#000';
+        document.body.style.overflow = 'hidden';
+        document.getElementById('screen').style.visibility = 'visible';
+        document.getElementById('ui').style.visibility = 'visible';
+        document.getElementById('transition-layer').style.visibility = 'visible';
+        const canvas = document.getElementById('screen');
+        const webgl = canvas.getContext('webgl2') || canvas.getContext('webgl');
+        if (!webgl) {
+          showGameError('Ce navigateur ne fournit pas WebGL. Essaie Safari ou Chrome à jour, puis recharge la page.');
+          return;
+        }
+        requestAnimationFrame(() => {
+          loadScript('error_screen.bundle.js?v=agenda-empty-2')
+            .then(() => loadScript('main.bundle.js?v=agenda-empty-2'))
+            .catch(() => showGameError('PolyTrack n’a pas pu être chargé sur cet appareil.'));
+        });
+        window.dispatchEvent(new Event('agenda-unlocked'));
+      };
+      days.forEach((day, index) => {
+        if (!day.dataset.date) day.dataset.date = `2026-09-${String(index + 1).padStart(2, '0')}`;
+        renderNote(day);
+        day.addEventListener('click', event => { if (!event.target.closest('button, textarea, input')) openEditor(day); });
+        day.addEventListener('keydown', event => { if ((event.key === 'Enter' || event.key === ' ') && !event.target.closest('textarea, input')) { event.preventDefault(); openEditor(day); } });
+      });
+      document.getElementById('editor-close').addEventListener('click', closeEditor);
+      backdrop.addEventListener('click', event => { if (event.target === backdrop) closeEditor(); });
+      document.getElementById('editor-delete').addEventListener('click', () => { if (!activeDay) return; localStorage.removeItem(labelFor(activeDay)); renderNote(activeDay); closeEditor(); });
+      document.getElementById('editor-save').addEventListener('click', () => {
+        if (!activeDay) return;
+        const value = editorText.value.trim();
+        if (activeDay.dataset.date && new Date(`${activeDay.dataset.date}T12:00:00`).getDay() === 1 && value.toLowerCase() === 'polytrack') return unlock();
+        if (value) localStorage.setItem(labelFor(activeDay), value); else localStorage.removeItem(labelFor(activeDay));
+        renderNote(activeDay); closeEditor();
+      });
+      document.addEventListener('keydown', event => { if (event.key === 'Escape' && !backdrop.hidden) closeEditor(); });
+    })();
+  </script>
+</body>
+</html>
