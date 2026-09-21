@@ -6,7 +6,7 @@ Agenda est un calendrier mensuel personnel qui embarque PolyTrack 0.6.3 dans une
 
 - Calendrier mensuel avec le numéro et le nom du jour dans chaque case.
 - Notes personnelles conservées dans le `localStorage` du navigateur.
-- Déverrouillage du jeu depuis le lundi 7 septembre avec le mot `polytrack`.
+- Déverrouillage du jeu depuis n’importe quel lundi avec le mot `polytrack`. Le lundi 7 septembre n’est qu’un exemple de case du calendrier.
 - PolyTrack 0.6.3 servi depuis `client/public`.
 - Relais serveur `/v6/*` vers `https://vps.kodub.com` pour les profils, maps, classements, temps et autres appels officiels.
 - Réécriture des URLs officielles en chemins same-origin (`/v6/...`) pour éviter que le navigateur tente de charger des ressources depuis un hôte interne `run.app`.
@@ -71,6 +71,25 @@ Les tests couvrent le calendrier, l’architecture du lancement PolyTrack, le re
   - `Referer: https://www.kodub.com/`
   - un `User-Agent` Agenda côté serveur.
 
+### Déploiement sur son propre serveur
+
+Il n’est normalement **pas nécessaire de modifier les URLs dans le client**. Les appels du jeu et de la synchronisation de profil utilisent des chemins relatifs comme `/v6/user` et `/v6/trackOfTheWeek`. Le navigateur les envoie donc automatiquement vers le domaine sur lequel Agenda est hébergé.
+
+Pour un serveur personnel, il faut seulement conserver ces routes sur le même domaine :
+
+```text
+/v6/iceServers
+/v6/multiplayer/host
+/v6/multiplayer/join
+/v6/user
+/v6/trackOfTheWeek
+/v6/leaderboard/*
+```
+
+Le relais Agenda continue ensuite à contacter `https://vps.kodub.com` côté serveur. La constante `POLYTRACK_ORIGIN` ne doit être changée que si vous utilisez une autre instance compatible de l’API PolyTrack. Les URLs `https://www.kodub.com` dans les en-têtes `Origin` et `Referer` servent à l’autorisation du serveur officiel et ne sont pas l’URL publique de votre site.
+
+Si vous installez Agenda derrière un reverse proxy ou un domaine personnalisé, configurez simplement le proxy pour transmettre les requêtes `/v6/*`, les méthodes `GET`, `POST` et `OPTIONS`, ainsi que WebSocket pour le multijoueur. Ne remplacez pas les chemins `/v6/...` par `localhost`, `run.app` ou un domaine interne.
+
 ## Profils PolyTrack
 
 PolyTrack distingue le profil local et le profil enregistré sur son serveur. Une clé privée générée uniquement dans le navigateur ne suffit pas : le profil doit être envoyé au serveur officiel avec :
@@ -129,7 +148,7 @@ Les connexions WebSocket doivent être attachées au serveur HTTP créé dans `s
 
 ## Modifier le projet sans casser PolyTrack
 
-1. Modifier le calendrier uniquement dans `client/index.html`.
+1. Modifier le calendrier uniquement dans `client/index.html`. La condition de lancement doit rester basée sur `getDay() === 1` pour conserver tous les lundis.
 2. Modifier le relais officiel uniquement dans `server/polytrack-api.ts`.
 3. Modifier le branchement serveur uniquement dans `server/_core/index.ts`.
 4. Ajouter ou modifier les tests dans `server/agenda-gate.test.ts` et `server/polytrack-api.test.ts`.
