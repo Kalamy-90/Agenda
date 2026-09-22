@@ -64,6 +64,25 @@ function isStringArray(value: unknown): value is string[] {
   return Array.isArray(value) && value.every(item => typeof item === "string" && item.length > 0);
 }
 
+function expandTurnUrls(urls: string | string[]) {
+  const source = Array.isArray(urls) ? urls : [urls];
+  const expanded: string[] = [];
+  for (const url of source) {
+    if (!url.startsWith("turn:") && !url.startsWith("turns:")) {
+      expanded.push(url);
+      continue;
+    }
+    expanded.push(url);
+    if (url.includes("?transport=")) continue;
+    if (url.startsWith("turn:")) {
+      expanded.push(`${url}?transport=udp`, `${url}?transport=tcp`);
+    } else {
+      expanded.push(`${url}?transport=tcp`);
+    }
+  }
+  return Array.from(new Set(expanded));
+}
+
 export function normalizeIceServers(value: unknown): IceServer[] {
   if (!Array.isArray(value)) return cloneIceServers(FALLBACK_ICE_SERVERS);
 
@@ -75,7 +94,10 @@ export function normalizeIceServers(value: unknown): IceServer[] {
       : isStringArray(candidate.urls) && candidate.urls.length > 0 ? candidate.urls : null;
     if (!urls) return [];
 
-    const server: IceServer = { urls };
+    const expandedUrls = expandTurnUrls(urls);
+    const server: IceServer = {
+      urls: expandedUrls.length === 1 ? expandedUrls[0] : expandedUrls,
+    };
     if (typeof candidate.username === "string" && candidate.username.length > 0) {
       server.username = candidate.username;
     }

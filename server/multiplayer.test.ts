@@ -22,7 +22,13 @@ describe("PolyTrack ICE servers", () => {
     ])).toEqual([
       { urls: "stun:vps2.kodub.com:443" },
       {
-        urls: ["turn:vps2.kodub.com:443", "turns:vps2.kodub.com:443"],
+        urls: [
+          "turn:vps2.kodub.com:443",
+          "turn:vps2.kodub.com:443?transport=udp",
+          "turn:vps2.kodub.com:443?transport=tcp",
+          "turns:vps2.kodub.com:443",
+          "turns:vps2.kodub.com:443?transport=tcp",
+        ],
         username: "temporary-user",
         credential: "temporary-secret",
       },
@@ -44,7 +50,11 @@ describe("PolyTrack ICE servers", () => {
 
     expect(first).toEqual(second);
     expect(first[0]).toMatchObject({
-      urls: "turn:vps2.kodub.com:443",
+      urls: [
+        "turn:vps2.kodub.com:443",
+        "turn:vps2.kodub.com:443?transport=udp",
+        "turn:vps2.kodub.com:443?transport=tcp",
+      ],
       username: "temporary-user",
       credential: "temporary-secret",
     });
