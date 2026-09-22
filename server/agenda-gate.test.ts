@@ -12,6 +12,10 @@ describe("agenda escape-game gate", () => {
     resolve(process.cwd(), "server/polytrack-api.ts"),
     "utf8",
   );
+  const multiplayerSource = readFileSync(
+    resolve(process.cwd(), "server/multiplayer.ts"),
+    "utf8",
+  );
   const projectConfig = readFileSync(
     resolve(process.cwd(), ".project-config.json"),
     "utf8",
@@ -49,5 +53,12 @@ describe("agenda escape-game gate", () => {
   it("uses Agenda as the Manus project title", () => {
     expect(projectConfig).toContain('"VITE_APP_TITLE": "Agenda"');
     expect(projectConfig).not.toContain('"VITE_APP_TITLE": "Agenda PolyTrack"');
+  });
+
+  it("persists signaling so host and joiner can use different instances", () => {
+    expect(multiplayerSource).toContain("createMultiplayerRoom");
+    expect(multiplayerSource).toContain("enqueueMultiplayerSignal");
+    expect(multiplayerSource).toContain("takeMultiplayerSignals");
+    expect(multiplayerSource).toContain("processPersistentSignals");
   });
 });

@@ -6,12 +6,7 @@ import { int, mysqlEnum, mysqlTable, text, timestamp, varchar } from "drizzle-or
  * Columns use camelCase to match both database fields and generated types.
  */
 export const users = mysqlTable("users", {
-  /**
-   * Surrogate primary key. Auto-incremented numeric value managed by the database.
-   * Use this for relations between tables.
-   */
   id: int("id").autoincrement().primaryKey(),
-  /** Manus OAuth identifier (openId) returned from the OAuth callback. Unique per user. */
   openId: varchar("openId", { length: 64 }).notNull().unique(),
   name: text("name"),
   email: varchar("email", { length: 320 }),
@@ -25,4 +20,22 @@ export const users = mysqlTable("users", {
 export type User = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
 
-// TODO: Add your tables here
+export const multiplayerRooms = mysqlTable("multiplayer_rooms", {
+  inviteCode: varchar("inviteCode", { length: 16 }).primaryKey(),
+  hostKey: varchar("hostKey", { length: 128 }).notNull(),
+  nickname: varchar("nickname", { length: 128 }),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  expiresAt: timestamp("expiresAt").notNull(),
+});
+
+export const multiplayerSignals = mysqlTable("multiplayer_signals", {
+  id: int("id").autoincrement().primaryKey(),
+  inviteCode: varchar("inviteCode", { length: 16 }).notNull(),
+  session: varchar("session", { length: 32 }).notNull(),
+  recipient: varchar("recipient", { length: 8 }).notNull(),
+  payload: text("payload").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type MultiplayerRoom = typeof multiplayerRooms.$inferSelect;
+export type MultiplayerSignal = typeof multiplayerSignals.$inferSelect;
