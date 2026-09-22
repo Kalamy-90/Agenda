@@ -5,8 +5,18 @@ import { WebSocketServer, WebSocket } from "ws";
 const PROTOCOL_VERSION = "0.6.3";
 const MAX_PLAYERS_PER_HOST = 16;
 const INVITE_TTL_MS = 2 * 60 * 60 * 1000;
+const ICE_CACHE_TTL_MS = 60 * 1000;
+const ICE_FALLBACK_CACHE_TTL_MS = 15 * 1000;
+const POLYTRACK_ICE_URL = `https://vps.kodub.com/v6/iceServers?version=${PROTOCOL_VERSION}`;
 
-const iceServers = [{ urls: "stun:stun.l.google.com:19302" }];
+export type IceServer = {
+  urls: string | string[];
+  username?: string;
+  credential?: string;
+};
+
+const FALLBACK_ICE_SERVERS: IceServer[] = [{ urls: "stun:stun.l.google.com:19302" }];
+let iceServerCache: { servers: IceServer[]; expiresAt: number } | null = null;
 
 type JsonMessage = Record<string, unknown>;
 
@@ -28,6 +38,76 @@ type JoinConnection = {
 
 const rooms = new Map<string, HostRoom>();
 const joins = new Map<string, JoinConnection>();
+
+function cloneIceServers(servers: IceServer[]) {
+  return servers.map(server => ({
+    urls: Array.isArray(server.urls) ? [...server.urls] : server.urls,
+    ...(server.username ? { username: server.username } : {}),
+    ...(server.credential ? { credential: server.credential } : {}),
+  }));
+}
+
+function isStringArray(value: unknown): value is string[] {
+  return Array.isArray(value) && value.every(item => typeof item === "string" && item.length > 0);
+}
+
+export function normalizeIceServers(value: unknown): IceServer[] {
+  if (!Array.isArray(value)) return cloneIceServers(FALLBACK_ICE_SERVERS);
+
+  const servers = value.flatMap(item => {
+    if (!item || typeof item !== "object" || Array.isArray(item)) return [];
+    const candidate = item as Record<string, unknown>;
+    const urls = typeof candidate.urls === "string"
+      ? candidate.urls.length > 0 ? candidate.urls : null
+      : isStringArray(candidate.urls) && candidate.urls.length > 0 ? candidate.urls : null;
+    if (!urls) return [];
+
+    const server: IceServer = { urls };
+    if (typeof candidate.username === "string" && candidate.username.length > 0) {
+      server.username = candidate.username;
+    }
+    if (typeof candidate.credential === "string" && candidate.credential.length > 0) {
+      server.credential = candidate.credential;
+    }
+    return [server];
+  });
+
+  return servers.length > 0 ? servers : cloneIceServers(FALLBACK_ICE_SERVERS);
+}
+
+export async function getIceServers(now = Date.now()): Promise<IceServer[]> {
+  if (iceServerCache && iceServerCache.expiresAt > now) {
+    return cloneIceServers(iceServerCache.servers);
+  }
+
+  try {
+    const response = await fetch(POLYTRACK_ICE_URL, {
+      headers: {
+        accept: "application/json",
+        origin: "https://www.kodub.com",
+        referer: "https://www.kodub.com/",
+        "user-agent": "Agenda relay/1.0",
+      },
+      signal: AbortSignal.timeout(5000),
+    });
+    if (!response.ok) {
+      throw new Error(`PolyTrack ICE request failed with ${response.status}`);
+    }
+
+    const servers = normalizeIceServers(await response.json());
+    iceServerCache = { servers, expiresAt: now + ICE_CACHE_TTL_MS };
+    return cloneIceServers(servers);
+  } catch (error) {
+    console.warn("[PolyTrack multiplayer] ICE server request failed; using STUN fallback", error);
+    const fallback = cloneIceServers(FALLBACK_ICE_SERVERS);
+    iceServerCache = { servers: fallback, expiresAt: now + ICE_FALLBACK_CACHE_TTL_MS };
+    return cloneIceServers(fallback);
+  }
+}
+
+export function resetIceServerCacheForTests() {
+  iceServerCache = null;
+}
 
 function sendJson(socket: WebSocket, message: JsonMessage) {
   if (socket.readyState === WebSocket.OPEN) {
@@ -176,7 +256,7 @@ function handleHost(socket: WebSocket) {
 function handleJoin(socket: WebSocket) {
   let session: string | null = null;
 
-  socket.on("message", raw => {
+  socket.on("message", async raw => {
     let message: unknown;
     try {
       message = JSON.parse(raw.toString());
@@ -210,6 +290,7 @@ function handleJoin(socket: WebSocket) {
       joins.set(session, connection);
       room.joins.set(session, socket);
 
+      const currentIceServers = await getIceServers();
       sendJson(room.host, protocolMessage("joinInvite", {
         session,
         offer: message.offer,
@@ -218,7 +299,7 @@ function handleJoin(socket: WebSocket) {
         nickname: message.nickname,
         countryCode: message.countryCode ?? null,
         carStyle: message.carStyle,
-        iceServers,
+        iceServers: currentIceServers,
         version: PROTOCOL_VERSION,
       }));
       return;
@@ -248,7 +329,7 @@ function handleJoin(socket: WebSocket) {
 
 export function registerPolyTrackMultiplayer(server: HttpServer, app: { get: Function }) {
   app.get("/v6/iceServers", (_req: unknown, res: { json: (value: unknown) => void }) => {
-    res.json(iceServers);
+    getIceServers().then(res.json.bind(res)).catch(() => res.json(cloneIceServers(FALLBACK_ICE_SERVERS)));
   });
 
   const websocketServer = new WebSocketServer({ noServer: true, maxPayload: 256 * 1024 });
