@@ -272,7 +272,9 @@ async function processHostSignal(room: HostRoom, session: string, message: JsonM
   const connection = joins.get(session);
   if (!connection || connection.host !== room.host) return;
 
-  if (message.type === "candidate") {
+  const isJoinIceCandidate = message.type === "candidate"
+    || (!("type" in message) && "candidate" in message);
+  if (isJoinIceCandidate) {
     sendJson(room.host, protocolMessage("iceCandidate", {
       session,
       candidate: message.candidate ?? null,

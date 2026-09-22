@@ -61,5 +61,6 @@ describe("agenda escape-game gate", () => {
     expect(multiplayerSource).toContain("takeMultiplayerSignals");
     expect(multiplayerSource).toContain("processPersistentSignals");
     expect(multiplayerSource).toContain('!("type" in message) && "candidate" in message');
+    expect(multiplayerSource.match(/!\("type" in message\) && "candidate" in message/g)).toHaveLength(2);
   });
 });
