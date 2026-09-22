@@ -11,6 +11,7 @@ import {
 } from "./db";
 
 const PROTOCOL_VERSION = "0.6.3";
+const HOST_ICE_MESSAGE_TYPE = "iceCandidate";
 const MAX_PLAYERS_PER_HOST = 16;
 const INVITE_TTL_MS = 2 * 60 * 60 * 1000;
 const ICE_CACHE_TTL_MS = 60 * 1000;
@@ -276,7 +277,7 @@ async function processHostSignal(room: HostRoom, session: string, message: JsonM
     || message.type === "iceCandidate"
     || (!("type" in message) && "candidate" in message);
   if (isJoinIceCandidate) {
-    sendJson(room.host, protocolMessage("iceCandidate", {
+    sendJson(room.host, protocolMessage(HOST_ICE_MESSAGE_TYPE, {
       session,
       candidate: message.candidate ?? null,
     }));
@@ -496,7 +497,7 @@ function handleJoin(socket: WebSocket) {
         || message.type === "iceCandidate"
         || (!("type" in message) && "candidate" in message);
       if (isJoinIceCandidate) {
-        await enqueueSignal(connection, "host", protocolMessage("iceCandidate", {
+        await enqueueSignal(connection, "host", protocolMessage(HOST_ICE_MESSAGE_TYPE, {
           session,
           candidate: message.candidate ?? null,
         }));
