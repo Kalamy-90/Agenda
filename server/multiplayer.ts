@@ -47,7 +47,7 @@ type JoinConnection = {
   host: WebSocket | null;
   join: WebSocket | null;
   persistent: boolean;
-  attemptTimer?: NodeJS.Timeout;
+  attemptExpiresAt?: number;
 };
 
 const rooms = new Map<string, HostRoom>();
@@ -206,7 +206,6 @@ function protocolMessage(type: string, extra: JsonMessage = {}): JsonMessage {
 function cleanupJoin(session: string) {
   const connection = joins.get(session);
   if (!connection) return;
-  if (connection.attemptTimer) clearTimeout(connection.attemptTimer);
   joins.delete(session);
   persistentJoinConnections.delete(session);
   const room = rooms.get(connection.inviteCode);
@@ -231,9 +230,12 @@ function cleanupRoom(room: HostRoom) {
 }
 
 function armJoinAttemptTimeout(connection: JoinConnection) {
-  connection.attemptTimer = setTimeout(() => {
-    const current = joins.get(connection.session);
-    if (current !== connection) return;
+  connection.attemptExpiresAt = Date.now() + JOIN_ATTEMPT_TTL_MS;
+}
+
+function expireJoinAttempts(now = Date.now()) {
+  for (const connection of Array.from(joins.values())) {
+    if (!connection.attemptExpiresAt || connection.attemptExpiresAt > now) continue;
     const payload = protocolMessage("declineJoin", {
       session: connection.session,
       reason: "WebRTCError",
@@ -243,8 +245,7 @@ function armJoinAttemptTimeout(connection: JoinConnection) {
       sendJson(connection.host, protocolMessage("joinDisconnect", { session: connection.session }));
     }
     cleanupJoin(connection.session);
-  }, JOIN_ATTEMPT_TTL_MS);
-  connection.attemptTimer.unref();
+  }
 }
 
 function expireRooms() {
@@ -314,6 +315,7 @@ async function processPersistentSignals() {
   if (signalPollInFlight) return;
   signalPollInFlight = true;
   try {
+    expireJoinAttempts();
     for (const room of Array.from(rooms.values())) {
       if (!room.persistent) continue;
       const signals = await takeMultiplayerSignals({

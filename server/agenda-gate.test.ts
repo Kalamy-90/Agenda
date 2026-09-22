@@ -64,7 +64,8 @@ describe("agenda escape-game gate", () => {
     expect(multiplayerSource.match(/!\("type" in message\) && "candidate" in message/g)).toHaveLength(2);
     expect(multiplayerSource).toContain('const HOST_ICE_MESSAGE_TYPE = "iceCandidate"');
     expect(multiplayerSource).toContain('protocolMessage(HOST_ICE_MESSAGE_TYPE, {\n          session,');
-    expect(multiplayerSource).toContain("const JOIN_ATTEMPT_TTL_MS = 35 * 1000");
+    expect(multiplayerSource).toContain('const JOIN_ATTEMPT_TTL_MS = 35 * 1000');
     expect(multiplayerSource).toContain("armJoinAttemptTimeout(connection)");
+    expect(multiplayerSource).toContain("expireJoinAttempts();");
   });
 });
