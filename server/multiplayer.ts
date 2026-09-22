@@ -273,6 +273,7 @@ async function processHostSignal(room: HostRoom, session: string, message: JsonM
   if (!connection || connection.host !== room.host) return;
 
   const isJoinIceCandidate = message.type === "candidate"
+    || message.type === "iceCandidate"
     || (!("type" in message) && "candidate" in message);
   if (isJoinIceCandidate) {
     sendJson(room.host, protocolMessage("iceCandidate", {
@@ -492,9 +493,11 @@ function handleJoin(socket: WebSocket) {
       const connection = joins.get(session);
       if (!connection || connection.join !== socket) return;
       const isJoinIceCandidate = message.type === "candidate"
+        || message.type === "iceCandidate"
         || (!("type" in message) && "candidate" in message);
       if (isJoinIceCandidate) {
-        await enqueueSignal(connection, "host", protocolMessage("candidate", {
+        await enqueueSignal(connection, "host", protocolMessage("iceCandidate", {
+          session,
           candidate: message.candidate ?? null,
         }));
       }
