@@ -489,7 +489,9 @@ function handleJoin(socket: WebSocket) {
 
       const connection = joins.get(session);
       if (!connection || connection.join !== socket) return;
-      if (message.type === "candidate") {
+      const isJoinIceCandidate = message.type === "candidate"
+        || (!("type" in message) && "candidate" in message);
+      if (isJoinIceCandidate) {
         await enqueueSignal(connection, "host", protocolMessage("candidate", {
           candidate: message.candidate ?? null,
         }));
