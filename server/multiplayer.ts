@@ -14,6 +14,7 @@ const PROTOCOL_VERSION = "0.6.3";
 const HOST_ICE_MESSAGE_TYPE = "iceCandidate";
 const MAX_PLAYERS_PER_HOST = 16;
 const INVITE_TTL_MS = 2 * 60 * 60 * 1000;
+const JOIN_ATTEMPT_TTL_MS = 35 * 1000;
 const ICE_CACHE_TTL_MS = 60 * 1000;
 const ICE_FALLBACK_CACHE_TTL_MS = 15 * 1000;
 const SIGNAL_POLL_INTERVAL_MS = 250;
@@ -46,6 +47,7 @@ type JoinConnection = {
   host: WebSocket | null;
   join: WebSocket | null;
   persistent: boolean;
+  attemptTimer?: NodeJS.Timeout;
 };
 
 const rooms = new Map<string, HostRoom>();
@@ -204,6 +206,7 @@ function protocolMessage(type: string, extra: JsonMessage = {}): JsonMessage {
 function cleanupJoin(session: string) {
   const connection = joins.get(session);
   if (!connection) return;
+  if (connection.attemptTimer) clearTimeout(connection.attemptTimer);
   joins.delete(session);
   persistentJoinConnections.delete(session);
   const room = rooms.get(connection.inviteCode);
@@ -225,6 +228,23 @@ function cleanupRoom(room: HostRoom) {
     }
   }
   room.joins.clear();
+}
+
+function armJoinAttemptTimeout(connection: JoinConnection) {
+  connection.attemptTimer = setTimeout(() => {
+    const current = joins.get(connection.session);
+    if (current !== connection) return;
+    const payload = protocolMessage("declineJoin", {
+      session: connection.session,
+      reason: "WebRTCError",
+    });
+    if (connection.join?.readyState === WebSocket.OPEN) sendJson(connection.join, payload);
+    if (connection.host?.readyState === WebSocket.OPEN) {
+      sendJson(connection.host, protocolMessage("joinDisconnect", { session: connection.session }));
+    }
+    cleanupJoin(connection.session);
+  }, JOIN_ATTEMPT_TTL_MS);
+  connection.attemptTimer.unref();
 }
 
 function expireRooms() {
@@ -470,6 +490,7 @@ function handleJoin(socket: WebSocket) {
           persistent: Boolean(!localRoom),
         };
         joins.set(session, connection);
+        armJoinAttemptTimeout(connection);
         if (localRoom) localRoom.joins.set(session, socket);
         else persistentJoinConnections.set(session, connection);
 
