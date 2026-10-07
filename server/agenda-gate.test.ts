@@ -24,6 +24,10 @@ describe("agenda escape-game gate", () => {
     resolve(process.cwd(), "client/public/jeux/index.html"),
     "utf8",
   );
+  const subwayPage = readFileSync(
+    resolve(process.cwd(), "client/public/jeux/subwaysurfers/index.html"),
+    "utf8",
+  );
 
   it("contains the Monday puzzle and the PolyTrack unlock condition", () => {
     expect(html).toContain("Agenda personnel");
@@ -69,8 +73,10 @@ describe("agenda escape-game gate", () => {
     expect(gamesPage).toContain("<h2>FauxPas</h2>");
     expect(gamesPage).toContain('href="/jeux/fauxpas/index.html"');
     expect(gamesPage).toContain("<h2>Subway Surfers</h2>");
-    expect(gamesPage).toContain('href="https://poki.com/en/g/subway-surfers"');
-    expect(gamesPage).toContain('target="_blank"');
+    expect(gamesPage).toContain('href="/jeux/subwaysurfers/index.html"');
+    expect(subwayPage).toContain('href="webgl.css"');
+    expect(subwayPage).toContain('src="src/game.js"');
+    expect(subwayPage).toContain("Retour aux mini-jeux");
   });
 
   it("persists signaling so host and joiner can use different instances", () => {

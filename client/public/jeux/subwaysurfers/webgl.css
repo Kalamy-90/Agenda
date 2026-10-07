@@ -1,0 +1,13 @@
+* { box-sizing: border-box; }
+html, body { min-height: 100%; margin: 0; }
+body { background: #101827; color: #eef3f8; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; padding: 24px; }
+#glcanvas { display: block; width: min(100%, 960px); height: auto; min-height: 360px; margin: 0 auto; border: 1px solid rgba(255,255,255,.2); background: #17233b; }
+.container { width: min(960px, 100%); margin: 18px auto 0; }
+.jumbotron { margin: 0; padding: 14px 18px; border-radius: 12px; background: rgba(255,255,255,.08); text-align: center; }
+#sc { margin: 0; font-size: clamp(20px, 4vw, 34px); }
+.btn-group { display: flex; justify-content: center; gap: 10px; margin: 18px auto 0; }
+button { border: 0; border-radius: 9px; padding: 11px 16px; background: #b5ddca; color: #18352b; cursor: pointer; font: inherit; font-weight: 700; }
+button:hover { filter: brightness(1.06); }
+.game-back { display: block; width: max-content; margin: 18px auto 0; color: #b5ddca; text-decoration: none; font-size: 14px; }
+.game-back:hover { text-decoration: underline; }
+@media (max-width: 680px) { body { padding: 12px; } #glcanvas { min-height: 260px; } .btn-group { flex-wrap: wrap; } }

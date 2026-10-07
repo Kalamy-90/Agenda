@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8">
+	<title>Subway Surf</title>
+	<link rel="stylesheet" href="webgl.css" type="text/css">
+  	<style>
+  	canvas{
+  		float: left;
+  	}
+  	.btn-group{
+  		margin-left: 200px;
+  		margin-top: 100px;
+  	}
+  	</style>
+  </head>
+
+  <body>
+    <canvas id="glcanvas" width="640" height="480"></canvas>
+  	<div class="container">
+    	<div class="jumbotron">
+    		<h1 class="display-4" id="sc"></h1>
+    	</div>
+   		<div class="btn-group" role="group" >
+			<button type="button" onclick="grayfn()" class="btn btn-dark">
+				Grayscale?
+			</button>
+				<button type="button" onclick="texture()" class="btn btn-success">
+					Textured?
+				</button>
+			</div>
+			<a class="game-back" href="../index.html">← Retour aux mini-jeux</a>
+	    </div>
+  </body>
+
+  <script src="src/gl-matrix.js"></script>
+  <script src="src/bg.js"></script> 
+  <script src="src/end.js"></script> 
+  <script src="src/ground.js"></script>
+  <script src="src/track.js"></script>
+  <script src="src/surfer.js"></script>
+  <script src="src/police.js"></script>
+  <script src="src/wall.js"></script>
+  <script src="src/coin.js"></script>
+  <script src="src/downboard.js"></script>
+  <script src="src/upboard.js"></script>
+  <script src="src/cones.js"></script>
+  <script src="src/fly.js"></script>
+  <script src="src/boots.js"></script>
+  <script src="src/magnet.js"></script>
+  <script src="src/train.js"></script>
+  <script src="src/sun.js"></script>
+  <script src="src/game.js"></script>
+</html>
