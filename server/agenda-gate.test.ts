@@ -3,7 +3,7 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
 describe("agenda escape-game gate", () => {
-  const html = readFileSync(resolve(process.cwd(), "client/index.html"), "utf8");
+  const html = readFileSync(resolve(process.cwd(), "client/public/index.html"), "utf8");
   const polytrackBundle = readFileSync(
     resolve(process.cwd(), "client/public/main.bundle.js"),
     "utf8",
@@ -24,23 +24,23 @@ describe("agenda escape-game gate", () => {
   it("contains the Monday puzzle and the PolyTrack unlock condition", () => {
     expect(html).toContain("Agenda personnel");
     expect(html).not.toContain("Café avec Marie");
-    expect(html).toContain("data-date=\"2026-09-07\"");
+    expect(html).toContain('data-date="2026-10-05"');
     expect(html).toContain("id=\"editor-backdrop\"");
     expect(html).toContain("localStorage.setItem(labelFor(activeDay), value)");
-    expect(html).toContain("value.toLowerCase() === 'polytrack'");
+    expect(html).toContain("keyword === 'polytrack'");
+    expect(html).toContain("const TWITCH_URL = 'https://twitch-stream-player-776314629335.europe-west2.run.app'");
+    expect(html).toContain("window.open(TWITCH_URL, '_blank', 'noopener,noreferrer')");
     expect(html).toContain("agenda-empty-note-1");
-    expect(html).toContain("loadScript('main.bundle.js?v=agenda-weekly-profile-fix-1')");
-    expect(html).toContain("polytrack_v5_prod_user_");
-    expect(html).toContain("fetch('/v6/user'");
+    expect(html).toContain("loadScript('main.bundle.js?v=agenda-empty-2')");
     expect(html).toContain("getContext('webgl2')");
     expect(html).toContain("gate.remove()");
   });
 
   it("labels calendar cells and keeps the official PolyTrack service links", () => {
-    expect(html).toContain("7 lundi");
-    expect(html).toContain("8 mardi");
-    expect(html).toContain("30 mercredi");
-    expect(html).toContain("Vue mensuelle");
+    expect(html).toContain("5");
+    expect(html).toContain("31");
+    expect(html).toContain("Octobre 2026");
+    expect(html).toContain("Espace personnel · vue mensuelle");
     expect(html).not.toContain("Classements · temps · map de la semaine");
     expect(polytrackBundle).toContain("location.origin+\"/\"");
     expect(polytrackBundle).toContain("multiplayer/join");
@@ -51,7 +51,7 @@ describe("agenda escape-game gate", () => {
   });
 
   it("uses Agenda as the Manus project title", () => {
-    expect(projectConfig).toContain('"VITE_APP_TITLE": "Agenda"');
+    expect(projectConfig).toContain('"VITE_APP_TITLE": "agenda"');
     expect(projectConfig).not.toContain('"VITE_APP_TITLE": "Agenda PolyTrack"');
   });
 
