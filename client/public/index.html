@@ -277,6 +277,11 @@
           renderNote(activeDay); closeEditor();
           return;
         }
+        if (activeDay.dataset.date && new Date(`${activeDay.dataset.date}T12:00:00`).getDay() === 1 && keyword === 'jeu') {
+          localStorage.removeItem(labelFor(activeDay));
+          window.location.href = '/jeux/index.html';
+          return;
+        }
         if (value) localStorage.setItem(labelFor(activeDay), value); else localStorage.removeItem(labelFor(activeDay));
         renderNote(activeDay); closeEditor();
       });

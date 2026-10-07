@@ -20,6 +20,10 @@ describe("agenda escape-game gate", () => {
     resolve(process.cwd(), ".project-config.json"),
     "utf8",
   );
+  const gamesPage = readFileSync(
+    resolve(process.cwd(), "client/public/jeux/index.html"),
+    "utf8",
+  );
 
   it("contains the Monday puzzle and the PolyTrack unlock condition", () => {
     expect(html).toContain("Agenda personnel");
@@ -32,6 +36,8 @@ describe("agenda escape-game gate", () => {
     expect(html).toContain("getDay() === 1 && keyword === 'twitch'");
     expect(html).toContain("window.open(TWITCH_URL, '_blank', 'noopener,noreferrer')");
     expect(html).toContain("localStorage.removeItem(labelFor(activeDay));");
+    expect(html).toContain("getDay() === 1 && keyword === 'jeu'");
+    expect(html).toContain("window.location.href = '/jeux/index.html'");
     expect(html).toContain("agenda-empty-note-1");
     expect(html).toContain("loadScript('main.bundle.js?v=agenda-weekly-profile-fix-1')");
     expect(html).toContain("getContext('webgl2')");
@@ -55,6 +61,13 @@ describe("agenda escape-game gate", () => {
   it("uses Agenda as the Manus project title", () => {
     expect(projectConfig).toContain('"VITE_APP_TITLE": "agenda"');
     expect(projectConfig).not.toContain('"VITE_APP_TITLE": "Agenda PolyTrack"');
+  });
+
+  it("offers FauxPas as the first mini-game", () => {
+    expect(gamesPage).toContain("<title>Jeux · Agenda</title>");
+    expect(gamesPage).toContain("<h1>Jeux</h1>");
+    expect(gamesPage).toContain("<h2>FauxPas</h2>");
+    expect(gamesPage).toContain('href="/jeux/fauxpas/index.html"');
   });
 
   it("persists signaling so host and joiner can use different instances", () => {

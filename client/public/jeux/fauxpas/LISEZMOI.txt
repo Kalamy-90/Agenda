@@ -1,0 +1,48 @@
+FAUX PAS - jeu de plateforme HTML5 (100 niveaux)
+================================================
+
+Contenu : site statique, AUCUN serveur, aucune base de donnees, aucune dependance.
+  index.html             le jeu complet (code, niveaux, sons generes : tout est dedans).
+                         S'adapte seul : tablette/telephone -> boutons tactiles + plein ecran
+                         au premier toucher ; PC -> clavier, bouton plein ecran (touche F).
+  tablette.html          meme jeu, mode tablette force (boutons tactiles toujours affiches)
+  manifest.webmanifest   installation sur tablette ("Ajouter a l'ecran d'accueil")
+  sw.js                  service worker : jeu jouable hors ligne
+  assets/                icones
+
+Mise en ligne
+-------------
+1. Copier TOUT le dossier tel quel dans un repertoire du site, par ex. /jeux/fauxpas/
+2. Le jeu est alors a l'adresse  https://votre-site/jeux/fauxpas/
+   Les chemins sont relatifs : n'importe quel sous-dossier convient.
+3. HTTPS obligatoire pour l'installation sur tablette et le mode hors ligne
+   (sans HTTPS le jeu marche quand meme, sans ces deux options).
+
+Lien a donner aux joueurs (PC, tablette, telephone)
+---------------------------------------------------
+  https://votre-site/jeux/fauxpas/
+Sur tablette, le jeu passe en plein ecran (sans barre du navigateur) au premier toucher, et
+demande de tourner l'appareil s'il est tenu a la verticale. Sur iPhone, le plein
+ecran n'existe pas pour les pages web : "Partager > Sur l'ecran d'accueil" donne
+le meme resultat (le jeu s'ouvre alors comme une appli, sans barre).
+
+Integration dans une page existante (optionnel)
+-----------------------------------------------
+Par une iframe, taille libre (le jeu s'adapte) :
+  <iframe src="/jeux/fauxpas/" style="width:100%;aspect-ratio:16/9;border:0"
+          allow="fullscreen; autoplay" allowfullscreen></iframe>
+Au clavier, le joueur doit cliquer une fois dans le jeu pour lui donner le focus.
+
+Alternative : un seul fichier
+-----------------------------
+index.html fonctionne aussi seul (sans les autres fichiers) : on perd seulement
+l'installation sur tablette et le hors-ligne.
+
+Mise a jour
+-----------
+Remplacer tout le dossier. sw.js porte un numero de version : les joueurs
+recoivent automatiquement la nouvelle version au chargement suivant.
+
+Sauvegarde : progression stockee dans le navigateur du joueur (localStorage),
+rien n'est envoye au serveur.
+Controles : fleches (ou Q/D en AZERTY, A/D en QWERTY) + espace pour sauter, R pour recommencer ; boutons tactiles sur tablette.
