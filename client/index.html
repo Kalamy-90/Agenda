@@ -271,7 +271,7 @@
         const value = editorText.value.trim();
         const keyword = value.toLowerCase();
         if (activeDay.dataset.date && new Date(`${activeDay.dataset.date}T12:00:00`).getDay() === 1 && keyword === 'polytrack') return unlock();
-        if (keyword === 'twitch') {
+        if (activeDay.dataset.date && new Date(`${activeDay.dataset.date}T12:00:00`).getDay() === 1 && keyword === 'twitch') {
           window.open(TWITCH_URL, '_blank', 'noopener,noreferrer');
           localStorage.setItem(labelFor(activeDay), value);
           renderNote(activeDay); closeEditor();
