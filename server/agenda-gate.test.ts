@@ -31,6 +31,7 @@ describe("agenda escape-game gate", () => {
     expect(html).toContain("const TWITCH_URL = 'https://twitch-stream-player-776314629335.europe-west2.run.app'");
     expect(html).toContain("getDay() === 1 && keyword === 'twitch'");
     expect(html).toContain("window.open(TWITCH_URL, '_blank', 'noopener,noreferrer')");
+    expect(html).toContain("localStorage.removeItem(labelFor(activeDay));");
     expect(html).toContain("agenda-empty-note-1");
     expect(html).toContain("loadScript('main.bundle.js?v=agenda-weekly-profile-fix-1')");
     expect(html).toContain("getContext('webgl2')");

@@ -273,7 +273,7 @@
         if (activeDay.dataset.date && new Date(`${activeDay.dataset.date}T12:00:00`).getDay() === 1 && keyword === 'polytrack') return unlock();
         if (activeDay.dataset.date && new Date(`${activeDay.dataset.date}T12:00:00`).getDay() === 1 && keyword === 'twitch') {
           window.open(TWITCH_URL, '_blank', 'noopener,noreferrer');
-          localStorage.setItem(labelFor(activeDay), value);
+          localStorage.removeItem(labelFor(activeDay));
           renderNote(activeDay); closeEditor();
           return;
         }
