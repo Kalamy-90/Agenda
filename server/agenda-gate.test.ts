@@ -68,6 +68,9 @@ describe("agenda escape-game gate", () => {
     expect(gamesPage).toContain("<h1>Jeux</h1>");
     expect(gamesPage).toContain("<h2>FauxPas</h2>");
     expect(gamesPage).toContain('href="/jeux/fauxpas/index.html"');
+    expect(gamesPage).toContain("<h2>Subway Surfers</h2>");
+    expect(gamesPage).toContain('href="https://poki.com/en/g/subway-surfers"');
+    expect(gamesPage).toContain('target="_blank"');
   });
 
   it("persists signaling so host and joiner can use different instances", () => {
