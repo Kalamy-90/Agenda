@@ -3,7 +3,7 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
 describe("agenda escape-game gate", () => {
-  const html = readFileSync(resolve(process.cwd(), "client/public/index.html"), "utf8");
+  const html = readFileSync(resolve(process.cwd(), "client/index.html"), "utf8");
   const polytrackBundle = readFileSync(
     resolve(process.cwd(), "client/public/main.bundle.js"),
     "utf8",
@@ -31,7 +31,7 @@ describe("agenda escape-game gate", () => {
     expect(html).toContain("const TWITCH_URL = 'https://twitch-stream-player-776314629335.europe-west2.run.app'");
     expect(html).toContain("window.open(TWITCH_URL, '_blank', 'noopener,noreferrer')");
     expect(html).toContain("agenda-empty-note-1");
-    expect(html).toContain("loadScript('main.bundle.js?v=agenda-empty-2')");
+    expect(html).toContain("loadScript('main.bundle.js?v=agenda-weekly-profile-fix-1')");
     expect(html).toContain("getContext('webgl2')");
     expect(html).toContain("gate.remove()");
   });
