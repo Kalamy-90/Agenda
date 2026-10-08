@@ -42,6 +42,10 @@ describe("agenda escape-game gate", () => {
     expect(html).toContain("loadScript('main.bundle.js?v=agenda-weekly-profile-fix-1')");
     expect(html).toContain("getContext('webgl2')");
     expect(html).toContain("gate.remove()");
+    expect(html).toContain("sessionStorage.getItem('agenda-polytrack-active')");
+    expect(html).toContain("sessionStorage.removeItem('agenda-polytrack-active')");
+    expect(html).toContain("window.location.replace('/')");
+    expect(html).toContain("sessionStorage.setItem('agenda-polytrack-active', '1')");
   });
 
   it("labels calendar cells and keeps the official PolyTrack service links", () => {
