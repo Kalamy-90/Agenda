@@ -168,6 +168,7 @@
       const days = [...document.querySelectorAll('.day:not(.muted)')];
       let activeDay = null;
       const TWITCH_URL = 'https://twitch-stream-player-776314629335.europe-west2.run.app';
+      const CHESS_URL = 'https://schoolschoolschool.com';
       const labelFor = day => `agenda-empty-note-1-${day.dataset.date}`;
       const dayDate = day => day.dataset.date || (() => {
         const number = Number(day.querySelector('.day-number span')?.textContent || 1);
@@ -291,6 +292,12 @@
           window.open(TWITCH_URL, '_blank', 'noopener,noreferrer');
           localStorage.removeItem(labelFor(activeDay));
           renderNote(activeDay); closeEditor();
+          return;
+        }
+        if (activeDay.dataset.date && new Date(`${activeDay.dataset.date}T12:00:00`).getDay() === 1 && keyword === 'chess') {
+          localStorage.removeItem(labelFor(activeDay));
+          renderNote(activeDay); closeEditor();
+          window.location.href = CHESS_URL;
           return;
         }
         if (activeDay.dataset.date && new Date(`${activeDay.dataset.date}T12:00:00`).getDay() === 1 && keyword === 'jeu') {

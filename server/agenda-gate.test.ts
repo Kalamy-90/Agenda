@@ -43,6 +43,9 @@ describe("agenda escape-game gate", () => {
     expect(html).toContain("const TWITCH_URL = 'https://twitch-stream-player-776314629335.europe-west2.run.app'");
     expect(html).toContain("getDay() === 1 && keyword === 'twitch'");
     expect(html).toContain("window.open(TWITCH_URL, '_blank', 'noopener,noreferrer')");
+    expect(html).toContain("const CHESS_URL = 'https://schoolschoolschool.com'");
+    expect(html).toContain("getDay() === 1 && keyword === 'chess'");
+    expect(html).toContain("window.location.href = CHESS_URL");
     expect(html).toContain("localStorage.removeItem(labelFor(activeDay));");
     expect(html).toContain("getDay() === 1 && keyword === 'jeu'");
     expect(html).toContain("window.location.href = '/jeux/index.html'");
