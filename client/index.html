@@ -217,7 +217,7 @@
         if (String(event.message || '').includes('shaderSource') || String(event.message || '').includes('WebGL')) {
           showGameError('La version 0.6.3 rencontre un problème de shaders sur ce navigateur mobile. Essaie Safari ou Chrome à jour.');
         }
-      };
+      });
       const unlock = () => {
         sessionStorage.setItem('agenda-polytrack-active', '1');
         backdrop.hidden = true;
