@@ -1,6 +1,6 @@
 // Service worker : met le jeu en cache pour jouer hors ligne une fois installé.
 // Changer VERSION à chaque mise à jour pour forcer le rafraîchissement du cache.
-const VERSION = 'fauxpas-7c1e0f098a';
+const VERSION = 'fauxpas-agenda-reload-20261008';
 const FILES = [
   './',
   'index.html',

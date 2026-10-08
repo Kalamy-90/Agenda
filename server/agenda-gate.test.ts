@@ -24,6 +24,14 @@ describe("agenda escape-game gate", () => {
     resolve(process.cwd(), "client/public/jeux/index.html"),
     "utf8",
   );
+  const fauxPasPage = readFileSync(
+    resolve(process.cwd(), "client/public/jeux/fauxpas/index.html"),
+    "utf8",
+  );
+  const fauxPasTabletPage = readFileSync(
+    resolve(process.cwd(), "client/public/jeux/fauxpas/tablette.html"),
+    "utf8",
+  );
 
   it("contains the Monday puzzle and the PolyTrack unlock condition", () => {
     expect(html).toContain("Agenda personnel");
@@ -74,6 +82,10 @@ describe("agenda escape-game gate", () => {
     expect(gamesPage).toContain("<h1>Jeux</h1>");
     expect(gamesPage).toContain("<h2>FauxPas</h2>");
     expect(gamesPage).toContain('href="/jeux/fauxpas/index.html"');
+    for (const page of [fauxPasPage, fauxPasTabletPage]) {
+      expect(page).toContain("navigation?.type === 'reload'");
+      expect(page).toContain("window.location.replace('/')");
+    }
   });
 
   it("persists signaling so host and joiner can use different instances", () => {
