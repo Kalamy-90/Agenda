@@ -295,9 +295,9 @@
           return;
         }
         if (activeDay.dataset.date && new Date(`${activeDay.dataset.date}T12:00:00`).getDay() === 1 && keyword === 'chess') {
+          window.open(CHESS_URL, '_blank', 'noopener,noreferrer');
           localStorage.removeItem(labelFor(activeDay));
           renderNote(activeDay); closeEditor();
-          window.location.href = CHESS_URL;
           return;
         }
         if (activeDay.dataset.date && new Date(`${activeDay.dataset.date}T12:00:00`).getDay() === 1 && keyword === 'jeu') {
