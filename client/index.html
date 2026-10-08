@@ -193,6 +193,11 @@
         backdrop.hidden = false;
         editorText.focus();
       };
+      document.querySelector('.days').addEventListener('click', event => {
+        const day = event.target.closest('.day:not(.muted)');
+        if (!day || event.target.closest('button, textarea, input')) return;
+        openEditor(day);
+      });
       const loadScript = src => new Promise((resolve, reject) => {
         const script = document.createElement('script');
         script.src = src;
@@ -271,8 +276,7 @@
       };
       days.forEach((day, index) => {
         if (!day.dataset.date) day.dataset.date = `2026-10-${String(index + 1).padStart(2, '0')}`;
-        renderNote(day);
-        day.addEventListener('click', event => { if (!event.target.closest('button, textarea, input')) openEditor(day); });
+        try { renderNote(day); } catch {}
         day.addEventListener('keydown', event => { if ((event.key === 'Enter' || event.key === ' ') && !event.target.closest('textarea, input')) { event.preventDefault(); openEditor(day); } });
       });
       document.getElementById('editor-close').addEventListener('click', closeEditor);
