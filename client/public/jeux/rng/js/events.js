@@ -1,0 +1,43 @@
+/* RNG∞ — événement de la semaine (2026-10-17) : chaque semaine (lundi 00:00 UTC → dimanche), un thème de badges et un
+ * objectif, calibrés pour ~400 tirages (fréquences mesurées sur 120 000 nombres au hasard). Un tirage compte une fois
+ * s'il obtient au moins un badge du thème. Les thèmes tournent dans l'ordre, sans changer l'XP ni les classements.
+ * Partagé par le site et le serveur (api/quests.js, api/_lib.js, api/_discord_tasks.js). */
+(function (root) {
+  const WEEK = 7 * 86400000;
+  const EPOCH = Date.parse('2026-10-19T00:00:00Z'); // un lundi : semaine 0 (la semaine -1, de lancement, prend le dernier thème)
+  const REWARD = 500;
+  const THEMES = [
+    { key: 'prime', example: '7919 is prime', emoji: '🔢', title: 'Prime Time', goal: 30, badges: ['PRIME'], desc: 'Roll 30 prime numbers' },
+    { key: 'happy', example: '19 is happy: 1²+9²=82 → 68 → 100 → 1', emoji: '😊', title: 'Happy Week', goal: 55, badges: ['HAPPY', 'HAPPY_PRIME'], desc: 'Roll 55 happy numbers' },
+    { key: 'round', example: '4500 ends in 00', emoji: '💯', title: 'Round Numbers', goal: 4, badges: ['CENTURY', 'MILLENNIUM', 'EPOCH', 'EON'], desc: 'Roll 4 numbers ending in 00 or more' },
+    { key: 'seq', example: '81234 contains 1234', emoji: '📈', title: 'Sequence Week', goal: 22, badges: ['SEQUENCE_3', 'SEQUENCE_4', 'SEQUENCE_6'], desc: 'Roll 22 numbers with a sequence (like 123 or 4567)' },
+    { key: 'mirror', example: '512215 is mirrored', emoji: '🪞', title: 'Mirror Week', goal: 22, badges: ['POCKET_MIRROR', 'MIRROR_BOOKENDS'], desc: 'Roll 22 mirrored numbers' },
+    { key: 'fib', example: '11235 is a Fibonacci slice', emoji: '🐚', title: 'Fibonacci Week', goal: 2, badges: ['FIBONACCI', 'FIB_CONTAINS_3', 'FIB_CONTAINS_4', 'FIB_CONTAINS_5'], desc: 'Roll 2 Fibonacci numbers or slices (like 112 or 1123)' },
+    { key: 'pal', example: '12321 reads the same both ways', emoji: '🔁', title: 'Palindrome Week', goal: 1, badges: ['PALINDROME'], desc: 'Roll a palindrome (reads the same both ways)' },
+    // Idée de JBearr12 (2026-11-01) : « Odd ball », un nombre impair sur deux, donc 200 pour ~400 tirages. Placé avant
+    // Meme Week, qui reste le dernier thème : la semaine -1 (lancement) et les semaines 0 à 6 gardent le leur.
+    { key: 'odd', example: '13579 is odd', emoji: '🧦', title: 'Odd Week', goal: 200, badges: ['ODD'], desc: 'Roll 200 odd numbers' },
+    { key: 'meme', example: '142069 contains 69', emoji: '😂', title: 'Meme Week', goal: 22, badges: ['NICE', 'BOTANIST', 'DEVIL', 'LEET', 'HELL'], desc: 'Roll 22 meme numbers (69, 420, 666, 1337, 7734)' },
+  ];
+
+  // L'événement de l'instant t : son numéro de semaine (identifiant), son thème, son début et sa fin.
+  function current(t = Date.now()) {
+    const week = Math.floor((t - EPOCH) / WEEK);
+    const theme = THEMES[((week % THEMES.length) + THEMES.length) % THEMES.length];
+    return { id: `w${week}`, week, start: EPOCH + week * WEEK, end: EPOCH + (week + 1) * WEEK, reward: REWARD, ...theme };
+  }
+  // Un tirage (identifiants des badges obtenus) compte-t-il pour l'événement ?
+  const counts = (ev, earnedIds) => (earnedIds || []).some(id => ev.badges.includes(id));
+
+  // Weekend Rush (2026-10-18) : samedi et dimanche (jours UTC), les pièces des tirages et des quêtes reçoivent un bonus.
+  // Le casino, les duels, les niveaux et le reste ne changent pas. ×2 jusqu'au 2026-10-25, puis +25 % (Sacha : le
+  // week-end créait 4,1 M pièces par jour contre 2,1 M en semaine).
+  const RUSH_RATE = 0.25;
+  const rush = (t = Date.now()) => [0, 6].includes(new Date(t).getUTCDay());
+  const rushMult = t => (rush(t) ? 1 + RUSH_RATE : 1);
+  const rushBonus = (coins, t) => (rush(t) ? Math.floor(coins * RUSH_RATE) : 0); // la part en plus, arrondie en dessous
+  const rushEnd = (t = Date.now()) => { const d = new Date(t); d.setUTCHours(0, 0, 0, 0); return d.getTime() + (d.getUTCDay() === 6 ? 2 : 1) * 86400000; };
+  const api = { RUSH_RATE, rush, rushMult, rushBonus, rushEnd, THEMES, REWARD, current, counts, key: ev => `ev:${ev.id}` };
+  if (typeof module === 'object' && module.exports) module.exports = api;
+  else root.RNGEvents = api;
+})(typeof window !== 'undefined' ? window : globalThis);

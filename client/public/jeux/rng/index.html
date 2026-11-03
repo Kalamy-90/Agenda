@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <link rel="canonical" href="https://rng-infinite.com/">
+  <script>
+    // Adresse officielle : le miroir GitHub Pages et les autres adresses renvoient vers rng-infinite.com (même page, même #).
+    if (/github\.io$|vercel\.app$/.test(location.hostname)) location.replace('https://rng-infinite.com/' + location.hash);
+  </script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>RNG∞</title>
+  <meta name="description" content="Infinite version of rngdle.com (https://www.rngdle.com): roll a number from 0 to 1,000,000, earn badges and XP, track your history and climb the leaderboard with friends.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎲</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Mono:wght@400;700&family=Press+Start+2P&family=Graduate&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css?v=b274a92ae1">
+  <link rel="stylesheet" href="css/premium.css?v=c25d43a454">
+  <link rel="stylesheet" href="css/buttons.css?v=c7f2bc5407">
+  <script>
+    // Thème appliqué avant le rendu pour éviter le flash.
+    (function () {
+      var pref = 'system';
+      try { pref = (JSON.parse(localStorage.getItem('rnginf.v1')) || {}).settings.theme || 'system'; } catch (e) {}
+      var dark = pref === 'dark' || (pref === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      document.documentElement.classList.toggle('dark', dark);
+    })();
+  </script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-left">
+      <div class="topbar-brand">
+        <a href="#/" class="logo">RNG∞</a>
+        <a href="#/about" class="icon-link" title="How it works" aria-label="How it works">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>
+        </a>
+      </div>
+      <!-- Mode difficile (demandé par Sacha, 2026-11-02) : sous le logo, Normal ou Hard (10 chiffres, classements à part). -->
+      <div class="mode-switch" id="mode-switch" role="radiogroup" aria-label="Game mode">
+        <button type="button" data-mode="normal" role="radio" aria-checked="true" title="Normal mode: numbers from 0 to 1,000,000">Normal</button>
+        <button type="button" data-mode="hard" role="radio" aria-checked="false" tabindex="-1" title="Hard mode: 10-digit numbers, rarities 50 times rarer, its own leaderboards">🔥 Hard</button>
+      </div>
+    </div>
+    <!-- Menu regroupé (demandé par Sacha, 2026-10-29) : 7 entrées toujours écrites ; Duel, Social et Me ont leurs onglets (#subnav).
+         « Battle » renommé « Duel » (idée de Kag, 2026-10-30) : le mot du jeu partout ailleurs ; Tournaments reste un onglet dessous. -->
+    <nav class="nav" aria-label="Main menu">
+      <a href="#/" data-route="home">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.2" fill="currentColor"/><circle cx="15.5" cy="15.5" r="1.2" fill="currentColor"/><circle cx="12" cy="12" r="1.2" fill="currentColor"/></svg>
+        <span>Roll</span>
+      </a>
+      <a href="#/shop" data-route="shop">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+        <span>Shop</span>
+      </a>
+      <a href="#/duel" data-route="battle">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="14.5 17.5 3 6 3 3 6 3 17.5 14.5"/><line x1="13" x2="19" y1="19" y2="13"/><line x1="16" x2="20" y1="16" y2="20"/><line x1="19" x2="21" y1="21" y2="19"/><polyline points="14.5 6.5 18 3 21 3 21 6 17.5 9.5"/><line x1="5" x2="9" y1="14" y2="18"/><line x1="7" x2="4" y1="17" y2="20"/><line x1="3" x2="5" y1="19" y2="21"/></svg>
+        <span>Duel</span>
+      </a>
+      <a href="#/leaderboard" data-route="leaderboard">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
+        <span class="nav-long">Leaderboard</span><span class="nav-short">Top</span>
+      </a>
+      <a href="#/gamble" data-route="casino">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/><path d="M12 3v6M12 15v6M3 12h6M15 12h6"/></svg>
+        <span>Casino</span>
+      </a>
+      <a href="#/friends" data-route="social">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        <span>Social</span>
+      </a>
+      <a href="#/me" data-route="me">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
+        <span>Me</span>
+      </a>
+    </nav>
+    <div class="topbar-right">
+      <button class="sound-btn" id="sound-btn" aria-label="Sound" aria-pressed="true" title="Sound on">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4z"/><path class="on" d="M15.54 8.46a5 5 0 0 1 0 7.07M19.07 4.93a10 10 0 0 1 0 14.14"/><path class="off" d="m23 9-6 6M17 9l6 6"/></svg>
+      </button>
+      <a class="hdr-coins" id="hdr-coins" href="#/shop" title="Your coins" hidden data-no-i18n>🪙 <b>0</b></a>
+      <div class="lang-switch" role="group" aria-label="Language" data-no-i18n>
+        <button data-lang="fr" title="Français" aria-pressed="false">FR</button><span aria-hidden="true">/</span><button data-lang="en" title="English" aria-pressed="true">EN</button>
+      </div>
+      <button class="sound-btn gear-btn" id="gear-btn" aria-label="Settings" title="Settings">
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      </button>
+      <div class="theme-switch" hidden role="radiogroup" aria-label="Theme">
+        <button data-theme-pref="light" aria-label="Light" title="Light">
+          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+        </button>
+        <button data-theme-pref="system" aria-label="System" title="System">
+          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 8a4 4 0 0 0 0 8z" fill="currentColor"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2"/></svg>
+        </button>
+        <button data-theme-pref="dark" aria-label="Dark" title="Dark">
+          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+        </button>
+      </div>
+      <a class="player-btn" id="player-btn" href="#/me" title="My profile">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
+        <span id="player-name">Player</span>
+      </a>
+    </div>
+  </header>
+
+  <nav class="subnav" id="subnav" aria-label="Section" hidden></nav>
+  <main id="app" class="app"></main>
+  <!-- Joueurs actifs en direct, en bas de chaque page (demandé par Sacha, 2026-11-01). -->
+  <footer class="site-foot" id="site-foot" hidden><span class="sf-dot" aria-hidden="true"></span><span id="sf-online"></span><span class="sf-tag">Live</span></footer>
+
+  <div id="modal-root"></div>
+  <div id="tooltip" class="chart-tooltip" hidden></div>
+  <div class="corners">
+  <button class="gh-corner news-corner" id="news-btn" data-news title="What's new" aria-label="What's new">📰</button>
+  <a class="gh-corner" href="https://github.com/sacha9214/rng-infinite" target="_blank" rel="noopener" title="RNG∞ on GitHub" aria-label="RNG∞ on GitHub">
+    <svg viewBox="0 0 16 16" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+  </a>
+  <a class="gh-corner discord-corner" href="https://discord.gg/Jz5VRa5w9R" target="_blank" rel="noopener" title="Join the RNG∞ Discord" aria-label="Join the RNG∞ Discord">
+    <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M20.32 4.37A19.8 19.8 0 0 0 15.4 2.85a.07.07 0 0 0-.08.04c-.21.38-.45.87-.61 1.25a18.3 18.3 0 0 0-5.43 0 12.6 12.6 0 0 0-.62-1.25.08.08 0 0 0-.08-.04 19.7 19.7 0 0 0-4.92 1.52.07.07 0 0 0-.03.03C.53 9.05-.32 13.58.1 18.06a.08.08 0 0 0 .03.06 19.9 19.9 0 0 0 5.99 3.03.08.08 0 0 0 .08-.03c.46-.63.87-1.3 1.23-1.99a.08.08 0 0 0-.04-.11 13.1 13.1 0 0 1-1.87-.89.08.08 0 0 1-.01-.13l.37-.29a.07.07 0 0 1 .08-.01c3.93 1.79 8.18 1.79 12.06 0a.07.07 0 0 1 .08.01l.37.29a.08.08 0 0 1-.01.13c-.6.35-1.22.64-1.87.89a.08.08 0 0 0-.04.11c.36.7.77 1.36 1.22 1.99a.08.08 0 0 0 .08.03 19.8 19.8 0 0 0 6-3.03.08.08 0 0 0 .03-.06c.5-5.18-.84-9.67-3.55-13.66a.06.06 0 0 0-.03-.03zM8.02 15.33c-1.18 0-2.16-1.09-2.16-2.42s.96-2.42 2.16-2.42c1.21 0 2.18 1.1 2.16 2.42 0 1.33-.96 2.42-2.16 2.42zm7.97 0c-1.18 0-2.15-1.09-2.15-2.42s.95-2.42 2.15-2.42c1.21 0 2.18 1.1 2.16 2.42 0 1.33-.95 2.42-2.16 2.42z"/></svg>
+  </a>
+  <button class="gh-corner coffee-corner gc-corner" data-gchat title="Global chat" aria-label="Global chat" aria-expanded="false">💬</button>
+  <button class="gh-corner coffee-corner idea-corner" data-idea title="Suggest an idea" aria-label="Suggest an idea">💡</button>
+  <button class="gh-corner coffee-corner" data-coffee title="Buy me a coffee" aria-label="Buy me a coffee">☕</button>
+  </div>
+  <div id="toast" class="toast" hidden></div>
+  <canvas id="fx" class="fx-canvas"></canvas>
+
+  <noscript><p class="noscript">RNG∞ needs JavaScript to roll.</p></noscript>
+
+  <script src="js/badge-meta.js?v=f37ccefdda"></script>
+  <script src="js/percentiles.js?v=ec729d5180"></script>
+  <script src="js/config.js?v=d439b8fdc7"></script>
+  <script src="js/engine.js?v=56f726e6b9"></script>
+  <script src="js/shop.js?v=84cef45c92"></script>
+  <script src="js/sharecard.js?v=2075d748b2"></script>
+  <script src="js/emotes.js?v=6bc0f9fc91"></script>
+  <script src="js/quests.js?v=2eaceadb2c"></script>
+  <script src="js/i18n.js?v=01e0f62617"></script>
+  <script src="js/achievements.js?v=160a6220cb"></script>
+  <script src="js/store.js?v=6cfb91fb3c"></script>
+  <script src="js/synth.js?v=9c48da3eb3"></script>
+  <script src="js/sound.js?v=179a626ca5"></script>
+  <script src="js/skinfx.js?v=e57c9428f6"></script>
+  <script src="js/fishing.js?v=42cb161b3a"></script>
+  <script src="js/wallfx.js?v=64515a6bc0"></script>
+  <!-- Données du mode difficile : jamais lues ici (type text/plain), chargées par js/app.js au premier passage en Hard. -->
+  <script type="text/plain" id="hard-data" src="js/hard-data.js?v=d878864489"></script>
+  <script src="js/app.js?v=f634a1ad7c"></script>
+</body>
+</html>

@@ -32,6 +32,14 @@ describe("agenda escape-game gate", () => {
     resolve(process.cwd(), "client/public/jeux/fauxpas/tablette.html"),
     "utf8",
   );
+  const rngPage = readFileSync(
+    resolve(process.cwd(), "client/public/jeux/rng/index.html"),
+    "utf8",
+  );
+  const rngLicense = readFileSync(
+    resolve(process.cwd(), "client/public/jeux/rng/LICENSE"),
+    "utf8",
+  );
 
   it("contains the Monday puzzle and the PolyTrack unlock condition", () => {
     expect(html).toContain("Agenda personnel");
@@ -46,6 +54,9 @@ describe("agenda escape-game gate", () => {
     expect(html).toContain("const CHESS_URL = 'https://schoolschoolschool.com'");
     expect(html).toContain("getDay() === 1 && keyword === 'chess'");
     expect(html).toContain("window.open(CHESS_URL, '_blank', 'noopener,noreferrer')");
+    expect(html).toContain("getDay() === 5 && keyword === 'rng'");
+    expect(html).toContain("window.location.href = RNG_URL");
+    expect(html).toContain("const RNG_URL = '/jeux/rng/index.html'");
     expect(html).toContain("localStorage.removeItem(labelFor(activeDay));");
     expect(html).toContain("getDay() === 1 && keyword === 'jeu'");
     expect(html).toContain("window.location.href = '/jeux/index.html'");
@@ -93,6 +104,12 @@ describe("agenda escape-game gate", () => {
       expect(page).toContain("navigation?.type === 'reload'");
       expect(page).toContain("window.location.replace('/')");
     }
+  });
+
+  it("integrates the MIT-licensed RNG Infinite web game", () => {
+    expect(rngPage).toContain("<title>RNG∞</title>");
+    expect(rngPage).toContain('src="js/app.js');
+    expect(rngLicense).toContain("MIT License");
   });
 
   it("persists signaling so host and joiner can use different instances", () => {

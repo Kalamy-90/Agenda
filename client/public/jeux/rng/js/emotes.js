@@ -1,0 +1,123 @@
+/* RNG∞ — émotes spéciales (celles qu'on achète dans la boutique : catalogue et prix dans js/shop.js, EMOTES).
+ * Contrairement aux six émotes de base (images dans img/emotes/), elles sont dessinées en SVG et animées : la même
+ * mascotte, un dé crème aux gros contours dans un écusson à huit pans. Les parties qui bougent portent la classe
+ * « em » et une classe d'animation (css/premium.css : elles ne tournent que dans une bulle de réaction, au survol du
+ * bouton, ou dans la boutique).
+ *   RNGEmotes.svg('gg')   → le dessin, à poser dans un élément .emote.emote-svg
+ */
+(function (root) {
+  'use strict';
+
+  const INK = '#231a14';
+  const S = `stroke="${INK}" stroke-linejoin="round" stroke-linecap="round"`;
+  // L'écusson : huit pans, un liseré plus clair, le bas assombri pour le volume.
+  const badge = (base, rim) => `
+    <polygon points="30,5 70,5 95,30 95,70 70,95 30,95 5,70 5,30" fill="${base}" ${S} stroke-width="4"/>
+    <polygon points="33,12 67,12 88,33 88,67 67,88 33,88 12,67 12,33" fill="none" stroke="${rim}" stroke-width="3" stroke-linejoin="round"/>
+    <polygon points="5,58 95,58 95,70 70,95 30,95 5,70" fill="#000" opacity=".16"/>`;
+  // Le dé : face crème, ombre en bas, reflet en haut à gauche.
+  const cube = (face = '#fff6e6', shade = '#ead9bd') => `
+    <ellipse cx="50" cy="78" rx="21" ry="4.5" fill="#000" opacity=".2"/>
+    <rect x="24" y="24" width="52" height="50" rx="14" fill="${face}" ${S} stroke-width="3.5"/>
+    <path d="M27 60 Q50 71 73 60 V61 A11 11 0 0 1 62 72 H38 A11 11 0 0 1 27 61 Z" fill="${shade}"/>
+    <ellipse cx="38" cy="33" rx="9" ry="3.6" fill="#fff" opacity=".85" transform="rotate(-18 38 33)"/>`;
+  const arcEyes = (y, up) => [36, 56].map(x => `<path d="M${x} ${y} q5 ${up ? -7 : 6} 10 0" fill="none" ${S} stroke-width="3.5"/>`).join('');
+  const roundEyes = (r, pr, dx = 0, dy = 0) => [40, 60].map(x => `<circle cx="${x}" cy="46" r="${r}" fill="#fff" ${S} stroke-width="3"/><circle cx="${x + dx}" cy="${46 + dy}" r="${pr}" fill="${INK}"/>`).join('');
+  const smile = (open = 14) => `<path d="M38 56 Q50 ${56 + open} 62 56 Z" fill="#7a1f2b" ${S} stroke-width="3"/><path d="M44 ${59 + open * .25} Q50 ${61 + open * .5} 56 ${59 + open * .25} Q50 ${57 + open * .2} 44 ${59 + open * .25}Z" fill="#ff7b8a"/>`;
+  const heart = (x, y, s, cls = '', style = '') => `<path class="em ${cls}" style="${style}" d="M${x} ${y + s * .9} C${x - s * 1.5} ${y - s * .2} ${x - s * .6} ${y - s * 1.1} ${x} ${y - s * .3} C${x + s * .6} ${y - s * 1.1} ${x + s * 1.5} ${y - s * .2} ${x} ${y + s * .9}Z" fill="#ff3b6b" ${S} stroke-width="2.4"/>`;
+  const coin = (x, y, r, cls = '', style = '') => `<g class="em ${cls}" style="${style}"><circle cx="${x}" cy="${y}" r="${r}" fill="#fbbf24" ${S} stroke-width="2.6"/><text x="${x}" y="${y + r * .42}" text-anchor="middle" font-size="${r * 1.25}" font-weight="900" font-family="Inter, system-ui, sans-serif" fill="#7a4a00">$</text></g>`;
+  const puff = (x, y, cls, style) => `<g class="em ${cls}" style="${style}"><circle cx="${x}" cy="${y}" r="6" fill="#fff" ${S} stroke-width="2.4"/><circle cx="${x + 6}" cy="${y - 3}" r="4.5" fill="#fff" ${S} stroke-width="2.4"/><circle cx="${x + 2}" cy="${y - 1}" r="4.2" fill="#fff"/></g>`;
+  // Un billet vertical, pivot en bas au milieu (pour l'éventail) : vert, cadre clair, « $ » au centre.
+  const bill = (x, y, cls = '', style = '', k = 1) => `<g class="em ${cls}" style="${style}"><rect x="${x - 9 * k}" y="${y - 30 * k}" width="${18 * k}" height="${30 * k}" rx="${2.6 * k}" fill="#22c55e" ${S} stroke-width="2.6"/><rect x="${x - 6 * k}" y="${y - 27 * k}" width="${12 * k}" height="${24 * k}" rx="${1.6 * k}" fill="none" stroke="#bbf7d0" stroke-width="1.5"/><text x="${x}" y="${y - 10.5 * k}" text-anchor="middle" font-size="${12 * k}" font-weight="900" font-family="Inter, system-ui, sans-serif" fill="#14532d">$</text></g>`;
+  const wrap = body => `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">${body}</svg>`;
+
+  const DRAW = {
+    // GG : yeux rieurs, pouce levé qui se balance, pastille « GG » qui saute.
+    gg: () => wrap(`${badge('#2563eb', '#93c5fd')}
+      <g class="em em-bounce">${cube()}${arcEyes(47, true)}${smile(13)}
+        <g class="em em-thumb"><rect x="77" y="38" width="9" height="17" rx="4.5" fill="#fff6e6" ${S} stroke-width="3"/><rect x="72" y="50" width="18" height="16" rx="6" fill="#fff6e6" ${S} stroke-width="3"/></g></g>
+      <g class="em em-pop"><rect x="6" y="6" width="34" height="20" rx="7" fill="#fde047" ${S} stroke-width="3"/><text x="23" y="21.5" text-anchor="middle" font-size="14" font-weight="900" font-family="Inter, system-ui, sans-serif" fill="${INK}">GG</text></g>`),
+    // Zzz : il dort, respire doucement, les Z montent.
+    sleep: () => wrap(`${badge('#4338ca', '#a5b4fc')}
+      <g class="em em-breathe">${cube()}${arcEyes(46, false)}<ellipse cx="50" cy="61" rx="4" ry="5" fill="#7a1f2b" ${S} stroke-width="2.6"/>
+        <path d="M30 26 Q50 6 70 26 Z" fill="#60a5fa" ${S} stroke-width="3"/><circle cx="72" cy="27" r="5" fill="#fff" ${S} stroke-width="2.6"/></g>
+      ${[[74, 30, 15, 0], [82, 20, 12, .5], [89, 12, 9, 1]].map(([x, y, s, d]) => `<text class="em em-z" style="animation-delay:${d}s" x="${x}" y="${y}" text-anchor="middle" font-size="${s}" font-weight="900" font-family="Inter, system-ui, sans-serif" fill="#fff" ${S} stroke-width="1.2" paint-order="stroke">Z</text>`).join('')}`),
+    // Ouf : regard inquiet, bouche qui tremble, une grosse goutte de sueur qui glisse.
+    sweat: () => wrap(`${badge('#0d9488', '#5eead4')}
+      <g class="em em-tremble">${cube()}${roundEyes(6.2, 2.2, -1.6, 1)}
+        <path d="M33 37 L45 40" fill="none" ${S} stroke-width="3"/><path d="M67 37 L55 40" fill="none" ${S} stroke-width="3"/>
+        <path d="M40 62 q3 -5 6.5 0 t6.5 0 t6.5 0" fill="none" ${S} stroke-width="3.2"/></g>
+      <path class="em em-drop" d="M76 26 C82 36 84 40 76 44 C68 40 70 36 76 26Z" fill="#7dd3fc" ${S} stroke-width="2.6"/>`),
+    // Love : des cœurs à la place des yeux, et d'autres qui s'envolent.
+    love: () => wrap(`${badge('#db2777', '#f9a8d4')}
+      <g class="em em-bounce">${cube()}${heart(40, 46, 6.2, 'em-pulse')}${heart(60, 46, 6.2, 'em-pulse', 'animation-delay:.15s')}${smile(15)}</g>
+      ${heart(16, 34, 4.4, 'em-float')}${heart(84, 28, 5, 'em-float', 'animation-delay:.7s')}${heart(78, 62, 3.6, 'em-float', 'animation-delay:1.3s')}`),
+    // Rage : tout rouge, sourcils froncés, dents serrées, il tremble et fume.
+    rage: () => wrap(`${badge('#b91c1c', '#fca5a5')}
+      ${puff(22, 24, 'em-steam', '')}${puff(70, 22, 'em-steam', 'animation-delay:.45s')}
+      <g class="em em-shake">${cube('#ff7a66', '#e2523f')}${roundEyes(5, 2.3, 0, 1.2)}
+        <path d="M31 35 L47 42" fill="none" ${S} stroke-width="4.2"/><path d="M69 35 L53 42" fill="none" ${S} stroke-width="4.2"/>
+        <rect x="37" y="56" width="26" height="11" rx="3.5" fill="#fff" ${S} stroke-width="3"/><path d="M43.5 56 V67 M50 56 V67 M56.5 56 V67" fill="none" stroke="${INK}" stroke-width="2"/></g>
+      <path class="em em-pulse" d="M80 40 l6 3 M86 40 l-6 3 M83 37 v9" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"/>`),
+    // Clown : perruque aux deux couleurs, nez rouge qui pouette, grand sourire maquillé.
+    clown: () => wrap(`${badge('#f59e0b', '#fde68a')}
+      <g class="em em-wobble">${[[22, 30, '#ef4444'], [17, 43, '#f97316'], [24, 55, '#ef4444'], [78, 30, '#3b82f6'], [83, 43, '#8b5cf6'], [76, 55, '#3b82f6']].map(([x, y, c]) => `<circle cx="${x}" cy="${y}" r="9" fill="${c}" ${S} stroke-width="3"/>`).join('')}</g>
+      ${cube()}
+      ${[40, 60].map(x => `<path d="M${x} 36 L${x + 4} 46 L${x} 56 L${x - 4} 46Z" fill="#60a5fa"/><circle cx="${x}" cy="46" r="3.2" fill="${INK}"/>`).join('')}
+      <path d="M33 57 Q50 79 67 57 Q50 64 33 57Z" fill="#fff" ${S} stroke-width="3"/><path d="M38 60 Q50 73 62 60 Q50 65 38 60Z" fill="#ef4444"/>
+      <g class="em em-honk"><circle cx="50" cy="52" r="6.5" fill="#ef4444" ${S} stroke-width="3"/><circle cx="48" cy="50" r="1.8" fill="#fff" opacity=".9"/></g>`),
+    // Rich : des pièces à la place des yeux, qui tournent ; la langue tirée ; il pleut des pièces.
+    money: () => wrap(`${badge('#15803d', '#86efac')}
+      ${coin(16, 22, 6, 'em-fall', '')}${coin(86, 30, 5, 'em-fall', 'animation-delay:.6s')}${coin(80, 12, 4.4, 'em-fall', 'animation-delay:1.1s')}
+      <g class="em em-bounce">${cube()}${coin(40, 46, 7.4, 'em-spinx')}${coin(60, 46, 7.4, 'em-spinx', 'animation-delay:.2s')}
+        <path d="M37 57 Q50 71 63 57 Z" fill="#7a1f2b" ${S} stroke-width="3"/><path d="M45 62 Q50 76 55 62 Z" fill="#ff7b8a" ${S} stroke-width="2.4"/></g>`),
+    // Money Spread (idée de finnnnn, 2026-10-24) : l'air content de lui (paupières mi-closes, sourire en coin), il étale
+    // un éventail de cinq billets qui s'ouvre et se referme, et deux billets s'envolent sur les côtés, derrière lui (jamais devant les yeux). Au repos, l'éventail est ouvert.
+    spread: () => wrap(`${badge('#ca8a04', '#fde68a')}
+      ${bill(50, 88, 'em-toss', 'animation-delay:.3s', .7)}${bill(50, 88, 'em-toss em-toss-r', 'animation-delay:1s', .7)}
+      <g class="em em-bounce">${cube()}
+        ${[40, 60].map(x => `<circle cx="${x}" cy="43" r="6" fill="#fff" ${S} stroke-width="3"/><circle cx="${x + 1.5}" cy="44.5" r="2.4" fill="${INK}"/><path d="M${x - 6.5} 42.5 Q${x} 36.5 ${x + 6.5} 42.5 Z" fill="#fff6e6" ${S} stroke-width="3"/>`).join('')}
+        <path d="M34 33 Q40 29 46 32" fill="none" ${S} stroke-width="3.2"/><path d="M54 32 Q60 27 66 31" fill="none" ${S} stroke-width="3.2"/>
+        <path d="M42 54 Q51 58 59 51" fill="none" ${S} stroke-width="3.4"/></g>
+      ${[-48, -24, 0, 24, 48].map((a, i) => bill(50, 94, 'em-fan', `--fan:${a}deg;animation-delay:${i * .04}s`)).join('')}`),
+    // Mind blown : les yeux ronds, la bouche ouverte, et le dessus de la tête qui explose.
+    mindblown: () => wrap(`${badge('#7c3aed', '#c4b5fd')}
+      ${cube()}<path d="M26 31 l7 -5 l6 6 l7 -7 l6 7 l7 -6 l7 6 l8 -4 V20 H26 Z" fill="#7c3aed" stroke="none"/><path d="M26 31 l7 -5 l6 6 l7 -7 l6 7 l7 -6 l7 6 l8 -4" fill="none" ${S} stroke-width="3"/>
+      ${roundEyes(7, 1.7)}<ellipse cx="50" cy="63" rx="5" ry="6.5" fill="#7a1f2b" ${S} stroke-width="3"/>
+      <g class="em em-burst">${[[50, 14, 10, '#fde047'], [37, 18, 7.5, '#fb923c'], [63, 18, 7.5, '#fb923c'], [44, 8, 6, '#fff'], [57, 9, 6, '#fff']].map(([x, y, r, c]) => `<circle cx="${x}" cy="${y}" r="${r}" fill="${c}" ${S} stroke-width="2.6"/>`).join('')}</g>
+      ${[[14, 16, -30], [86, 16, 30], [10, 34, -70], [90, 34, 70]].map(([x, y, a], i) => `<g transform="rotate(${a} ${x} ${y})"><path class="em em-ray" style="animation-delay:${i * .12}s" d="M${x} ${y} l0 -8" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"/></g>`).join('')}`),
+    // Super confused (idée de finnnnn, 2026-10-22) : la tête penchée qui oscille, un œil grand et l'autre petit, la
+    // bouche en zigzag, et trois points d'interrogation qui montent l'un après l'autre.
+    confused: () => wrap(`${badge('#0d9488', '#99f6e4')}
+      <g class="em em-tilt">${cube()}
+        <circle cx="40" cy="45" r="7.5" fill="#fff" ${S} stroke-width="3"/><circle cx="42" cy="44" r="2.6" fill="${INK}"/>
+        <circle cx="61" cy="47" r="4.2" fill="#fff" ${S} stroke-width="3"/><circle cx="60" cy="48" r="1.7" fill="${INK}"/>
+        <path d="M34 36 L46 34" fill="none" ${S} stroke-width="3.6"/><path d="M55 40 Q61 34 67 39" fill="none" ${S} stroke-width="3.6"/>
+        <path d="M38 62 l4 -3 l4 3 l4 -3 l4 3 l4 -3 l4 3" fill="none" ${S} stroke-width="3.2"/></g>
+      ${[[17, 30, 22, 0], [84, 26, 19, .5], [80, 50, 14, 1]].map(([x, y, f, d]) => `<text class="em em-float" style="animation-delay:${d}s" x="${x}" y="${y}" text-anchor="middle" font-size="${f}" font-weight="900" font-family="system-ui, sans-serif" fill="#fde047" stroke="${INK}" stroke-width="1.8" paint-order="stroke">?</text>`).join('')}`),
+    // Hungry (idée de Monokromati, 2026-11-01) : les yeux brillants levés vers le repas, la bouche ouverte, la langue
+    // qui pend, un filet de bave qui s'allonge et une goutte qui tombe ; il tient une fourchette et un couteau qu'il
+    // tape à tour de rôle sur la table (en avant, devant le dé : on les voit en entier).
+    hungry: () => wrap(`${badge('#ea580c', '#fed7aa')}
+      <g class="em em-bounce">${cube()}
+        ${[40, 60].map(x => `<circle cx="${x}" cy="44" r="7" fill="#fff" ${S} stroke-width="3"/><circle cx="${x + .6}" cy="41.5" r="3.4" fill="${INK}"/><circle cx="${x + 1.8}" cy="40" r="1.3" fill="#fff"/><circle cx="${x - .6}" cy="43.6" r=".7" fill="#fff"/>`).join('')}
+        <path d="M33 33 Q39 29 45 33" fill="none" ${S} stroke-width="3"/><path d="M55 33 Q61 29 67 33" fill="none" ${S} stroke-width="3"/>
+        <path d="M38 55 Q50 72 62 55 Z" fill="#7a1f2b" ${S} stroke-width="3"/>
+        <path d="M44 60 Q50 74 56 60 Q50 63 44 60 Z" fill="#ff7b8a" ${S} stroke-width="2.4"/>
+        <path class="em em-drool" d="M59 59 C61 64 60.5 69 59.6 73 C58.6 69 58 64 59 59 Z" fill="#bae6fd" stroke="#38bdf8" stroke-width="1.4"/></g>
+      <path class="em em-drip" d="M59.6 74 C62 78 62.4 80.5 59.6 82 C56.8 80.5 57.2 78 59.6 74 Z" fill="#7dd3fc" ${S} stroke-width="2"/>
+      <g class="em em-chop">
+        <rect x="13" y="50" width="6" height="32" rx="3" fill="#cbd5e1" ${S} stroke-width="2.6"/>
+        <path d="M9 22 V36 Q9 44 16 44 Q23 44 23 36 V22" fill="none" ${S} stroke-width="2.6"/>
+        <path d="M9 22 V36 Q9 44 16 44 Q23 44 23 36 V22 M13.7 22 V34 M18.3 22 V34" fill="none" stroke="#e2e8f0" stroke-width="1.6" stroke-linecap="round"/>
+        <rect x="14" y="42" width="4" height="10" fill="#cbd5e1" ${S} stroke-width="2.2"/></g>
+      <g class="em em-chop" style="animation-delay:.6s">
+        <rect x="81" y="54" width="6" height="28" rx="3" fill="#92400e" ${S} stroke-width="2.6"/>
+        <path d="M81 55 V26 Q81 20 87 18 Q91 28 89 40 Q88 50 87 55 Z" fill="#e2e8f0" ${S} stroke-width="2.6"/>
+        <path d="M84 24 V50" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" opacity=".8"/></g>`),
+  };
+
+  const cache = new Map();
+  const svg = id => { if (!cache.has(id)) cache.set(id, DRAW[id] ? DRAW[id]() : ''); return cache.get(id); };
+  root.RNGEmotes = { svg, has: id => !!DRAW[id], ids: Object.keys(DRAW) };
+})(typeof window !== 'undefined' ? window : globalThis);
