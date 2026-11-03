@@ -40,6 +40,10 @@ describe("agenda escape-game gate", () => {
     resolve(process.cwd(), "client/public/jeux/rng/LICENSE"),
     "utf8",
   );
+  const rngApp = readFileSync(
+    resolve(process.cwd(), "client/public/jeux/rng/js/app.js"),
+    "utf8",
+  );
   const rngProxy = readFileSync(
     resolve(process.cwd(), "server/rng-api-proxy.ts"),
     "utf8",
@@ -124,6 +128,9 @@ describe("agenda escape-game gate", () => {
     expect(rngPage).toContain("<title>RNG∞</title>");
     expect(rngPage).toContain('src="js/app.js');
     expect(rngLicense).toContain("MIT License");
+    expect(rngApp).toContain("choose a name to continue as a guest");
+    expect(rngApp).toContain("Sign in with a name and password");
+    expect(rngApp).toContain("passwordLogin");
     expect(rngProxy).toContain('const RNG_API_ORIGIN = "https://db.rng-infinite.com"');
     expect(rngProxy).toContain('app.use("/rng-api"');
     expect(rngProxy).not.toContain("req.query.url");

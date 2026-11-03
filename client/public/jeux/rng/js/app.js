@@ -1897,13 +1897,14 @@
     const offerGoogle = googleEnabled() && !Store.player.google;
     openModal(`
       <h2>Choose your player name</h2>
-      <p class="panel-note" style="margin:-.3rem 0 1rem">It appears on the leaderboard next to your best rolls. Each name belongs to one player only.</p>
+      <p class="panel-note" style="margin:-.3rem 0 1rem">It appears on the leaderboard next to your best rolls. Each name belongs to one player only. Google is optional: choose a name to continue as a guest.</p>
       <form id="name-form">
         <input class="input" id="name-input" maxlength="20" autocomplete="off" placeholder="Your name" value="${esc(suggested)}" style="width:100%">
         <p class="field-error" id="name-error"${error ? '' : ' hidden'}>${esc(error)}</p>
         <div class="actions"><button class="btn-roll small" type="submit">${label}</button></div>
       </form>
-      ${offerGoogle ? `<div class="or-google"><span class="panel-note">or sign in to keep your player on every device</span><div id="google-btn" class="google-btn"></div>${GOOGLE_PROMO}</div>` : ''}`, m => {
+      ${offerGoogle ? `<div class="or-google"><span class="panel-note">or sign in to keep your player on every device</span><div id="google-btn" class="google-btn"></div>${GOOGLE_PROMO}</div>` : ''}
+      <div class="or-password"><span class="panel-note">Already have a password? Sign in with your player name instead.</span>${passwordHTML()}</div>`, m => {
       const input = m.querySelector('#name-input');
       const errorEl = m.querySelector('#name-error');
       const submit = m.querySelector('#name-form button');
@@ -1928,6 +1929,7 @@
         afterGoogle = then;
         renderGoogleButton(m.querySelector('#google-btn'));
       }
+      bindPassword(m);
     });
   }
 
