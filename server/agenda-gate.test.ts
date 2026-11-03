@@ -100,6 +100,8 @@ describe("agenda escape-game gate", () => {
     expect(gamesPage).toContain("<h1>Jeux</h1>");
     expect(gamesPage).toContain("<h2>FauxPas</h2>");
     expect(gamesPage).toContain('href="/jeux/fauxpas/index.html"');
+    expect(gamesPage).toContain("<h2>RNG Infinite</h2>");
+    expect(gamesPage).toContain('href="/jeux/rng/index.html"');
     for (const page of [fauxPasPage, fauxPasTabletPage]) {
       expect(page).toContain("navigation?.type === 'reload'");
       expect(page).toContain("window.location.replace('/')");
