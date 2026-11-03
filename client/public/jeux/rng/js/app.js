@@ -80,7 +80,7 @@
   // ---------------------------------------------------------------- serveur (classement en ligne, hébergé sur Vercel)
   // L'API tourne sur notre serveur (RNG_CONFIG.apiBase) ; la copie hébergée avec le site (même domaine) sert de secours.
   // En local et sur les aperçus, tout reste sur le même domaine.
-  const AGENDA_INTEGRATION = location.pathname.startsWith('/jeux/rng/');
+  const AGENDA_INTEGRATION = location.pathname.startsWith('/rng/') || location.pathname.startsWith('/jeux/rng/');
   const HOSTED = /(^|\.)rng-infinite\.com$/.test(location.hostname) || location.hostname.endsWith('github.io');
   const API_SAME = AGENDA_INTEGRATION ? '/rng-api' : (location.hostname.endsWith('github.io') ? window.RNG_CONFIG.apiFallback : '');
   const API_BASE = HOSTED && window.RNG_CONFIG.apiBase !== location.origin ? window.RNG_CONFIG.apiBase : '';

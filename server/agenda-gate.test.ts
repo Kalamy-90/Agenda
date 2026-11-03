@@ -44,6 +44,10 @@ describe("agenda escape-game gate", () => {
     resolve(process.cwd(), "server/rng-api-proxy.ts"),
     "utf8",
   );
+  const gameAliases = readFileSync(
+    resolve(process.cwd(), "server/game-aliases.ts"),
+    "utf8",
+  );
 
   it("contains the Monday puzzle and the PolyTrack unlock condition", () => {
     expect(html).toContain("Agenda personnel");
@@ -60,10 +64,10 @@ describe("agenda escape-game gate", () => {
     expect(html).toContain("window.open(CHESS_URL, '_blank', 'noopener,noreferrer')");
     expect(html).toContain("getDay() === 1 && keyword === 'rng'");
     expect(html).toContain("window.location.href = RNG_URL");
-    expect(html).toContain("const RNG_URL = '/jeux/rng/index.html'");
+    expect(html).toContain("const RNG_URL = '/rng/index.html'");
     expect(html).toContain("localStorage.removeItem(labelFor(activeDay));");
     expect(html).toContain("getDay() === 1 && keyword === 'jeu'");
-    expect(html).toContain("window.location.href = '/jeux/index.html'");
+    expect(html).toContain("window.location.href = '/selection/index.html'");
     expect(html).toContain("agenda-empty-note-1");
     expect(html).toContain("loadScript('main.bundle.js?v=agenda-weekly-profile-fix-1')");
     expect(html).toContain("getContext('webgl2')");
@@ -99,12 +103,12 @@ describe("agenda escape-game gate", () => {
     expect(projectConfig).not.toContain('"VITE_APP_TITLE": "Agenda PolyTrack"');
   });
 
-  it("keeps the game page free of direct game links", () => {
+  it("offers games through clean URLs", () => {
     expect(gamesPage).toContain("<title>Jeux · Agenda</title>");
     expect(gamesPage).toContain("<h1>Jeux</h1>");
-    expect(gamesPage).toContain("Les mini-jeux se lancent depuis l’agenda");
+    expect(gamesPage).toContain('href="/fauxpas/index.html"');
+    expect(gamesPage).toContain('href="/rng/index.html"');
     expect(gamesPage).not.toContain('href="/jeux/fauxpas/index.html"');
-    expect(gamesPage).not.toContain("<h2>RNG Infinite</h2>");
     expect(gamesPage).not.toContain('href="/jeux/rng/index.html"');
     for (const page of [fauxPasPage, fauxPasTabletPage]) {
       expect(page).toContain("navigation?.type === 'reload'");
@@ -112,6 +116,8 @@ describe("agenda escape-game gate", () => {
     }
     expect(rngPage).toContain("navigationEntry?.type === 'reload'");
     expect(rngPage).toContain("location.replace('/')");
+    expect(gameAliases).toContain('"selection", "fauxpas", "rng"');
+    expect(gameAliases).toContain("res.sendFile(target)");
   });
 
   it("integrates the MIT-licensed RNG Infinite web game", () => {

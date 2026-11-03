@@ -176,7 +176,7 @@
       let activeDay = null;
       const TWITCH_URL = 'https://twitch-stream-player-776314629335.europe-west2.run.app';
       const CHESS_URL = 'https://schoolschoolschool.com';
-      const RNG_URL = '/jeux/rng/index.html';
+        const RNG_URL = '/rng/index.html';
       const labelFor = day => `agenda-empty-note-1-${day.dataset.date}`;
       const dayDate = day => day.dataset.date || (() => {
         const number = Number(day.querySelector('.day-number span')?.textContent || 1);
@@ -316,7 +316,7 @@
         }
         if (activeDay.dataset.date && new Date(`${activeDay.dataset.date}T12:00:00`).getDay() === 1 && keyword === 'jeu') {
           localStorage.removeItem(labelFor(activeDay));
-          window.location.href = '/jeux/index.html';
+          window.location.href = '/selection/index.html';
           return;
         }
         if (value) localStorage.setItem(labelFor(activeDay), value); else localStorage.removeItem(labelFor(activeDay));
