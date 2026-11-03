@@ -54,7 +54,7 @@ describe("agenda escape-game gate", () => {
     expect(html).toContain("const CHESS_URL = 'https://schoolschoolschool.com'");
     expect(html).toContain("getDay() === 1 && keyword === 'chess'");
     expect(html).toContain("window.open(CHESS_URL, '_blank', 'noopener,noreferrer')");
-    expect(html).toContain("getDay() === 5 && keyword === 'rng'");
+    expect(html).toContain("getDay() === 1 && keyword === 'rng'");
     expect(html).toContain("window.location.href = RNG_URL");
     expect(html).toContain("const RNG_URL = '/jeux/rng/index.html'");
     expect(html).toContain("localStorage.removeItem(labelFor(activeDay));");
@@ -100,8 +100,8 @@ describe("agenda escape-game gate", () => {
     expect(gamesPage).toContain("<h1>Jeux</h1>");
     expect(gamesPage).toContain("<h2>FauxPas</h2>");
     expect(gamesPage).toContain('href="/jeux/fauxpas/index.html"');
-    expect(gamesPage).toContain("<h2>RNG Infinite</h2>");
-    expect(gamesPage).toContain('href="/jeux/rng/index.html"');
+    expect(gamesPage).not.toContain("<h2>RNG Infinite</h2>");
+    expect(gamesPage).not.toContain('href="/jeux/rng/index.html"');
     for (const page of [fauxPasPage, fauxPasTabletPage]) {
       expect(page).toContain("navigation?.type === 'reload'");
       expect(page).toContain("window.location.replace('/')");

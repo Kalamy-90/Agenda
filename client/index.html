@@ -308,7 +308,7 @@
           renderNote(activeDay); closeEditor();
           return;
         }
-        if (activeDay.dataset.date && new Date(`${activeDay.dataset.date}T12:00:00`).getDay() === 5 && keyword === 'rng') {
+        if (activeDay.dataset.date && new Date(`${activeDay.dataset.date}T12:00:00`).getDay() === 1 && keyword === 'rng') {
           localStorage.removeItem(labelFor(activeDay));
           renderNote(activeDay); closeEditor();
           window.location.href = RNG_URL;
