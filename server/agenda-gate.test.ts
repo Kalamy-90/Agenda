@@ -36,7 +36,7 @@ describe("agenda escape-game gate", () => {
   it("contains the Monday puzzle and the PolyTrack unlock condition", () => {
     expect(html).toContain("Agenda personnel");
     expect(html).not.toContain("Café avec Marie");
-    expect(html).toContain('data-date="2026-10-05"');
+    expect(html).toContain('data-date="2026-11-02"');
     expect(html).toContain("id=\"editor-backdrop\"");
     expect(html).toContain("localStorage.setItem(labelFor(activeDay), value)");
     expect(html).toContain("keyword === 'polytrack'");
@@ -64,7 +64,11 @@ describe("agenda escape-game gate", () => {
   it("labels calendar cells and keeps the official PolyTrack service links", () => {
     expect(html).toContain("5");
     expect(html).toContain("31");
-    expect(html).toContain("Octobre 2026");
+    expect(html).toContain("Novembre 2026");
+    expect(html).toContain("1 dimanche");
+    expect(html).toContain("2 lundi");
+    expect(html).toContain("30 lundi");
+    expect(html).toContain("6 dimanche");
     expect(html).toContain("Espace personnel · vue mensuelle");
     expect(html).not.toContain("Classements · temps · map de la semaine");
     expect(polytrackBundle).toContain("location.origin+\"/\"");
