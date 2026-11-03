@@ -99,17 +99,19 @@ describe("agenda escape-game gate", () => {
     expect(projectConfig).not.toContain('"VITE_APP_TITLE": "Agenda PolyTrack"');
   });
 
-  it("offers FauxPas as the first mini-game", () => {
+  it("keeps the game page free of direct game links", () => {
     expect(gamesPage).toContain("<title>Jeux · Agenda</title>");
     expect(gamesPage).toContain("<h1>Jeux</h1>");
-    expect(gamesPage).toContain("<h2>FauxPas</h2>");
-    expect(gamesPage).toContain('href="/jeux/fauxpas/index.html"');
+    expect(gamesPage).toContain("Les mini-jeux se lancent depuis l’agenda");
+    expect(gamesPage).not.toContain('href="/jeux/fauxpas/index.html"');
     expect(gamesPage).not.toContain("<h2>RNG Infinite</h2>");
     expect(gamesPage).not.toContain('href="/jeux/rng/index.html"');
     for (const page of [fauxPasPage, fauxPasTabletPage]) {
       expect(page).toContain("navigation?.type === 'reload'");
       expect(page).toContain("window.location.replace('/')");
     }
+    expect(rngPage).toContain("navigationEntry?.type === 'reload'");
+    expect(rngPage).toContain("location.replace('/')");
   });
 
   it("integrates the MIT-licensed RNG Infinite web game", () => {
