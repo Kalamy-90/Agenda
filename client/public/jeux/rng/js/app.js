@@ -80,8 +80,9 @@
   // ---------------------------------------------------------------- serveur (classement en ligne, hébergé sur Vercel)
   // L'API tourne sur notre serveur (RNG_CONFIG.apiBase) ; la copie hébergée avec le site (même domaine) sert de secours.
   // En local et sur les aperçus, tout reste sur le même domaine.
-  const HOSTED = /(^|\.)rng-infinite\.com$/.test(location.hostname) || location.hostname.endsWith('github.io') || location.pathname.startsWith('/jeux/rng/');
-  const API_SAME = location.hostname.endsWith('github.io') ? window.RNG_CONFIG.apiFallback : '';
+  const AGENDA_INTEGRATION = location.pathname.startsWith('/jeux/rng/');
+  const HOSTED = /(^|\.)rng-infinite\.com$/.test(location.hostname) || location.hostname.endsWith('github.io');
+  const API_SAME = AGENDA_INTEGRATION ? '/rng-api' : (location.hostname.endsWith('github.io') ? window.RNG_CONFIG.apiFallback : '');
   const API_BASE = HOSTED && window.RNG_CONFIG.apiBase !== location.origin ? window.RNG_CONFIG.apiBase : '';
   // Notre serveur lit le JSON quel que soit le type annoncé ; la copie hébergée avec le site exige application/json.
   const API_PLAIN = API_BASE && API_BASE !== window.RNG_CONFIG.apiFallback;

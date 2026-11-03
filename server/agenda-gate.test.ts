@@ -40,6 +40,10 @@ describe("agenda escape-game gate", () => {
     resolve(process.cwd(), "client/public/jeux/rng/LICENSE"),
     "utf8",
   );
+  const rngProxy = readFileSync(
+    resolve(process.cwd(), "server/rng-api-proxy.ts"),
+    "utf8",
+  );
 
   it("contains the Monday puzzle and the PolyTrack unlock condition", () => {
     expect(html).toContain("Agenda personnel");
@@ -112,6 +116,9 @@ describe("agenda escape-game gate", () => {
     expect(rngPage).toContain("<title>RNG∞</title>");
     expect(rngPage).toContain('src="js/app.js');
     expect(rngLicense).toContain("MIT License");
+    expect(rngProxy).toContain('const RNG_API_ORIGIN = "https://db.rng-infinite.com"');
+    expect(rngProxy).toContain('app.use("/rng-api"');
+    expect(rngProxy).not.toContain("req.query.url");
   });
 
   it("persists signaling so host and joiner can use different instances", () => {
